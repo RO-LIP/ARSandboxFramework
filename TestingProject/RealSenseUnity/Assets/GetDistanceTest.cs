@@ -59,15 +59,26 @@ public class GetDistanceTest : MonoBehaviour
                                 splatWeights[0] = 1;
                             }
 
-                            if (height >= 1 && height < 3)
+                            if (height >= 1 && height < 2)
                             {
                                 splatWeights[1] = 1;
                             }
+                            if (height >= 2f && height < 2.5f)
+                            {
+                                splatWeights[1] = 0.5f;
+                                splatWeights[2] = 0.5f;
+                            }
 
-                            if (height >= 3 && height < 4)
+                            if (height >= 2.5f && height < 3.5f)
                             {
                                 splatWeights[2] = 1;
                             }
+                            if (height >= 3.5f && height < 4)
+                            {
+                                splatWeights[2] = 0.5f;
+                                splatWeights[3] = 0.5f;
+                            }
+                          
                             if (height >= 4)
                             {
                                 splatWeights[3] = 1;
