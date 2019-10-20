@@ -65,8 +65,9 @@ public class GetDistanceTest : MonoBehaviour
                             }
                             if (height >= 2f && height < 2.5f)
                             {
-                                splatWeights[1] = 0.5f;
-                                splatWeights[2] = 0.5f;
+                                var diff = height - 2f;
+                                splatWeights[1] = 0.5f - diff;
+                                splatWeights[2] = 0.5f + diff;
                             }
 
                             if (height >= 2.5f && height < 3.5f)
@@ -75,8 +76,9 @@ public class GetDistanceTest : MonoBehaviour
                             }
                             if (height >= 3.5f && height < 4)
                             {
-                                splatWeights[2] = 0.5f;
-                                splatWeights[3] = 0.5f;
+                                var diff = height - 3.5f;
+                                splatWeights[2] = 0.5f - diff;
+                                splatWeights[3] = 0.5f + diff;
                             }
                           
                             if (height >= 4)
