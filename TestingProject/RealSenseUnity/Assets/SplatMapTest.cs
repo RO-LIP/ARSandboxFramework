@@ -33,9 +33,9 @@ public class SplatMapTest : MonoBehaviour
                         }
                     }
 
-                    terrain.terrainData.heightmapResolution = dfWidth;
+                    terrain.terrainData.heightmapResolution = dfWidth + 1;
                     terrain.terrainData.size = new Vector3(dfWidth, 100, dfHeight);
-                    terrain.terrainData.SetHeightsDelayLOD(0, 0, Map);
+                    terrain.terrainData.SetHeights(0, 0, Map);
 
                     float[,,] splatmapData = new float[terrain.terrainData.alphamapWidth, terrain.terrainData.alphamapHeight, terrain.terrainData.alphamapLayers];
                     for (int y = 0; y < terrain.terrainData.alphamapHeight; y++)
