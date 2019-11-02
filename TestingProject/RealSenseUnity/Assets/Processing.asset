@@ -39,13 +39,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a370b019fb25fbe4384bc45033197fcd, type: 3}
   m_Name: RsHoleFillingFilter
   m_EditorClassIdentifier: 
-  enabled: 1
-  _holesFill: 0
+  enabled: 0
+  _holesFill: 2
 --- !u!114 &5975629578806780527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53,12 +53,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48f1a4dc738fa514aa5e5d4cc3665aae, type: 3}
   m_Name: RsSpatialFilter
   m_EditorClassIdentifier: 
-  enabled: 1
+  enabled: 0
   _filterMagnitude: 2
   _filterSmoothAlpha: 0.5
   _filterSmoothDelta: 20
