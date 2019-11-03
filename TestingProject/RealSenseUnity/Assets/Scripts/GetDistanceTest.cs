@@ -51,7 +51,9 @@ public class GetDistanceTest : MonoBehaviour
         {
             using (var depthFrame = frameSet.DepthFrame as DepthFrame)
             {
-                if (depthFrame != null)
+                if (depthFrame != null 
+                    && heightMapQueue.IsEmpty && tempheightMapQueue.IsEmpty
+                    )
                 {
                    
                     int dfWidth = depthFrame.Width;
@@ -78,9 +80,19 @@ public class GetDistanceTest : MonoBehaviour
 
                     height = dfHeight;
                     width = dfWidth;
+                    if (!tempheightMapQueue.IsEmpty)
+                    {
+                        var clear = new float[width, width];
+                        tempheightMapQueue.TryDequeue(out clear);
+                    }
                     if (tempheightMapQueue.IsEmpty)
                     {
                         tempheightMapQueue.Enqueue(Map);
+                    }
+                    if (!heightMapQueue.IsEmpty)
+                    {
+                        var clear = new float[width, width];
+                        heightMapQueue.TryDequeue(out clear);
                     }
                     if (heightMapQueue.IsEmpty)
                     {
@@ -170,7 +182,11 @@ public class GetDistanceTest : MonoBehaviour
                         }
                     }
                 }
-
+                if (!splatMapQueue.IsEmpty)
+                {
+                    var clear = new float[width, width, 4];
+                    splatMapQueue.TryDequeue(out clear);
+                }
                 if (splatMapQueue.IsEmpty)
                 {
                     splatMapQueue.Enqueue(splatmapData);
@@ -198,7 +214,7 @@ public class GetDistanceTest : MonoBehaviour
 
             terrain.terrainData.heightmapResolution = width;
             terrain.terrainData.size = new Vector3(width, 100, width);
-            terrain.terrainData.SetHeightsDelayLOD(0, 0, heightmap);
+            terrain.terrainData.SetHeights(0, 0, heightmap);
         }
 
         if (!splatMapQueue.IsEmpty)
