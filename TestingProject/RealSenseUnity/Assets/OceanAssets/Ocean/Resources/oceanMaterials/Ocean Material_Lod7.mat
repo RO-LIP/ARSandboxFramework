@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Ocean Material_Lod7
+  m_Shader: {fileID: 4800000, guid: 7e44d417df9bfd4459ea4a38c4f3a14e, type: 3}
+  m_ShaderKeywords: DCON FOGON SHORE_ON
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2521
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BoatWake:
+        m_Texture: {fileID: 2800000, guid: 1073c04a1a76c3f409a49905994250e3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Bump:
+        m_Texture: {fileID: 2800000, guid: 9b23cca83dd292347a7744f0e22759c0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpLod1:
+        m_Texture: {fileID: 2800000, guid: b5ddff7f19c5e134482fc767608ca81a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 8, y: 8}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 8, y: 8}
+        m_Offset: {x: 0, y: 0}
+    - _Cube:
+        m_Texture: {fileID: 8900000, guid: ac52f0b3b7ff44bdb9e21d1f648c422c, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Foam:
+        m_Texture: {fileID: 2800000, guid: caef365a9d88d10428a63dcbd99dc7f9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FoamBump:
+        m_Texture: {fileID: 2800000, guid: c7fbcbea79265ad4db3b3d5d017fb6c7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FoamGradient:
+        m_Texture: {fileID: 2800000, guid: 6d3e7874c4612e747a97c89306ec1ee3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Fresnel:
+        m_Texture: {fileID: 2800000, guid: d90d92548352b8c45ace9116719eeaa0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 438c882d50f72d94190e7c2240175549, type: 3}
+        m_Scale: {x: 6, y: 6}
+        m_Offset: {x: 0, y: 0}
+    - _Reflection:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Refraction:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _WaterTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 100, y: 100}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _Blend: 0
+    - _BlendA: -0.6632021
+    - _BlendB: -0.7484403
+    - _DistanceCancellation: 2000
+    - _FoamFactor: 0.81
+    - _FoamSize: 1
+    - _Shininess: 0.7665094
+    - _ShoreDistance: 10.3
+    - _ShoreStrength: 1.5
+    - _Size: 0.03125
+    - _SpecPower: 0.667
+    - _Specularity: 1.56
+    - _Translucency: 0.7
+    - _WaterLod1Alpha: 1
+    - _WaveOffset: -63.01681
+    m_Colors:
+    - _Color: {r: 0.3895323, g: 0.6146181, b: 0.5976806, a: 1}
+    - _FakeUnderwaterColor: {r: 0.33780277, g: 0.64705884, b: 0.50629395, a: 1}
+    - _ReflectColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Size: {r: 512, g: 30, b: 512, a: 0}
+    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SunColor: {r: 0.9705882, g: 0.94341964, b: 0.8849481, a: 1}
+    - _SunDir: {r: 0.60033315, g: -0.7994753, b: 0.02096349, a: 0}
+    - _SurfaceColor: {r: 0.6905277, g: 0.72140557, b: 0.75735295, a: 1}
+    - _SurfaceColorLod1: {r: 0.49545845, g: 0.8381487, b: 0.85294116, a: 1}
+    - _WaterColor: {r: 0.5364403, g: 0.8604701, b: 0.8897059, a: 1}
+    - _WaterColorLod1: {r: 0.046009947, g: 0.1691676, b: 0.27205884, a: 1}
+    - _WaveOffset: {r: -87.81002, g: -87.81002, b: -87.81002, a: -87.81002}
+--- !u!1002 &2100001
+EditorExtensionImpl:
+  serializedVersion: 6
