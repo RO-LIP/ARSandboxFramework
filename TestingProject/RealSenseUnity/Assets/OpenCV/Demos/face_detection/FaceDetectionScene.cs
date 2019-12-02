@@ -23,7 +23,8 @@
 			base.forceFrontalCamera = true; // we work with frontal cams here, let's force it for macOS s MacBook doesn't state frontal cam correctly
 
 			byte[] shapeDat = shapes.bytes;
-			if (shapeDat.Length == 0)
+            // actually ignore these message because we dont need a 100mb face detection file :-) 
+			/*if (shapeDat.Length == 0)
 			{
 				string errorMessage =
 					"In order to have Face Landmarks working you must download special pre-trained shape predictor " +
@@ -38,7 +39,7 @@
 #else
              UnityEngine.Debug.Log(errorMessage);
 #endif
-			}
+			}*/
 
 			processor = new FaceProcessorLive<WebCamTexture>();
 			processor.Initialize(faces.text, eyes.text, shapes.bytes);
