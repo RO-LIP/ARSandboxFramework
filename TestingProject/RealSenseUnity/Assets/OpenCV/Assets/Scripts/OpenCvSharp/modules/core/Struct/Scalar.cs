@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace OpenCvSharp
 {
     /// <summary>
-    /// 
+    /// Template class for a 4-element vector derived from Vec.
     /// </summary>
     [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public struct Scalar : IEquatable<Scalar>
     {
         #region Field
@@ -381,7 +383,7 @@ namespace OpenCvSharp
 #endif
         public override string ToString()
         {
-            return String.Format("[{0}, {1}, {2}, {3}]", Val0, Val1, Val2, Val3);
+            return string.Format("[{0}, {1}, {2}, {3}]", Val0, Val1, Val2, Val3);
         }
 
         #endregion

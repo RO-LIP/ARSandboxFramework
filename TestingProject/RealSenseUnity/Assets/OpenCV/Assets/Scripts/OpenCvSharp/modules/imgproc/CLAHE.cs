@@ -5,21 +5,20 @@ namespace OpenCvSharp
     /// <summary>
     /// Contrast Limited Adaptive Histogram Equalization
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public sealed class CLAHE : Algorithm
     {
-        private bool disposed;
-
         /// <summary>
         /// cv::Ptr&lt;CLAHE&gt;
         /// </summary>
-        private Ptr<CLAHE> ptrObj;
+        private Ptr ptrObj;
 
         /// <summary>
         /// 
         /// </summary>
         private CLAHE(IntPtr p)
         {
-            ptrObj = new Ptr<CLAHE>(p);
+            ptrObj = new Ptr(p);
             ptr = ptrObj.Get();
         }
 
@@ -35,39 +34,15 @@ namespace OpenCvSharp
                 clipLimit, tileGridSize.GetValueOrDefault(new Size(8, 8)));
             return new CLAHE(ptr);
         }
-        
+
         /// <summary>
-        /// Releases the resources
+        /// Releases managed resources
         /// </summary>
-        /// <param name="disposing">
-        /// If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged resources can be disposed.
-        /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
-        /// </param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeManaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    // releases managed resources
-                    if (disposing)
-                    {
-                    }
-                    // releases unmanaged resources
-                    if (IsEnabledDispose)
-                    {
-                        if (ptrObj != null)
-                            ptrObj.Dispose();
-                        ptrObj = null;
-                        ptr = IntPtr.Zero;
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            ptrObj?.Dispose();
+            ptrObj = null;
+            base.DisposeManaged();
         }
 
         /// <summary>
@@ -77,19 +52,20 @@ namespace OpenCvSharp
         /// <param name="dst"></param>
         public void Apply(InputArray src, OutputArray dst)
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().Name);
+            ThrowIfDisposed();
             if (src == null)
-                throw new ArgumentNullException("nameof(src)");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("nameof(dst)");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
 
             NativeMethods.imgproc_CLAHE_apply(ptr, src.CvPtr, dst.CvPtr);
 
             dst.Fix();
+            GC.KeepAlive(this);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
         }
 
         /// <summary>
@@ -98,10 +74,9 @@ namespace OpenCvSharp
         /// <param name="clipLimit"></param>
         public void SetClipLimit(double clipLimit)
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().Name);
-
+            ThrowIfDisposed();
             NativeMethods.imgproc_CLAHE_setClipLimit(ptr, clipLimit);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -110,10 +85,10 @@ namespace OpenCvSharp
         /// <returns></returns>
         public double GetClipLimit()
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().Name);
-
-            return NativeMethods.imgproc_CLAHE_getClipLimit(ptr);
+            ThrowIfDisposed();
+            var res = NativeMethods.imgproc_CLAHE_getClipLimit(ptr);
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
@@ -131,10 +106,9 @@ namespace OpenCvSharp
         /// <param name="tileGridSize"></param>
         public void SetTilesGridSize(Size tileGridSize)
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().Name);
-
+            ThrowIfDisposed();
             NativeMethods.imgproc_CLAHE_setTilesGridSize(ptr, tileGridSize);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -143,10 +117,10 @@ namespace OpenCvSharp
         /// <returns></returns>
         public Size GetTilesGridSize()
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().Name);
-
-            return NativeMethods.imgproc_CLAHE_getTilesGridSize(ptr);
+            ThrowIfDisposed();
+            var res = NativeMethods.imgproc_CLAHE_getTilesGridSize(ptr);
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
@@ -164,10 +138,29 @@ namespace OpenCvSharp
         /// </summary>
         public void CollectGarbage()
         {
-            if (disposed)
-                throw new ObjectDisposedException(GetType().Name);
-
+            ThrowIfDisposed();
             NativeMethods.imgproc_CLAHE_collectGarbage(ptr);
+            GC.KeepAlive(this);
+        }
+
+        internal class Ptr : OpenCvSharp.Ptr
+        {
+            public Ptr(IntPtr ptr) : base(ptr)
+            {
+            }
+
+            public override IntPtr Get()
+            {
+                var res = NativeMethods.imgproc_Ptr_CLAHE_get(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                NativeMethods.imgproc_Ptr_CLAHE_delete(ptr);
+                base.DisposeUnmanaged();
+            }
         }
     }
 }

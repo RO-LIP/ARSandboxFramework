@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace OpenCvSharp
@@ -8,9 +8,9 @@ namespace OpenCvSharp
     /// <summary>
     /// File Storage Node class
     /// </summary>
-    public class FileNode : DisposableCvObject
+    public class FileNode : DisposableCvObject, IEnumerable<FileNode>
     {
-        private bool disposed;
+        // ReSharper disable InconsistentNaming
 
         #region Init & Disposal
 
@@ -32,30 +32,12 @@ namespace OpenCvSharp
         }
 
         /// <summary>
-        /// 
+        /// Releases unmanaged resources
         /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeUnmanaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    if (disposing)
-                    {
-                    }
-                    if (ptr != IntPtr.Zero)
-                    {
-                        NativeMethods.core_FileNode_delete(ptr);
-                        ptr = IntPtr.Zero;
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            NativeMethods.core_FileNode_delete(ptr);
+            base.DisposeUnmanaged();
         }
 
         #endregion
@@ -70,8 +52,10 @@ namespace OpenCvSharp
         public static explicit operator int(FileNode node)
         {
             if (node == null)
-                throw new ArgumentNullException("nameof(node)");
-            return NativeMethods.core_FileNode_toInt(node.CvPtr);
+                throw new ArgumentNullException(nameof(node));
+            var res = NativeMethods.core_FileNode_toInt(node.CvPtr);
+            GC.KeepAlive(node);
+            return res;
         }
 
         /// <summary>
@@ -82,8 +66,10 @@ namespace OpenCvSharp
         public static explicit operator float(FileNode node)
         {
             if (node == null)
-                throw new ArgumentNullException("nameof(node)");
-            return NativeMethods.core_FileNode_toFloat(node.CvPtr);
+                throw new ArgumentNullException(nameof(node));
+            var res = NativeMethods.core_FileNode_toFloat(node.CvPtr);
+            GC.KeepAlive(node);
+            return res;
         }
 
         /// <summary>
@@ -94,8 +80,10 @@ namespace OpenCvSharp
         public static explicit operator double(FileNode node)
         {
             if (node == null)
-                throw new ArgumentNullException("nameof(node)");
-            return NativeMethods.core_FileNode_toDouble(node.CvPtr);
+                throw new ArgumentNullException(nameof(node));
+            var res = NativeMethods.core_FileNode_toDouble(node.CvPtr);
+            GC.KeepAlive(node);
+            return res;
         }
 
         /// <summary>
@@ -106,9 +94,10 @@ namespace OpenCvSharp
         public static explicit operator string(FileNode node)
         {
             if (node == null)
-                throw new ArgumentNullException("nameof(node)");
+                throw new ArgumentNullException(nameof(node));
             var buf = new StringBuilder(1 << 16);
             NativeMethods.core_FileNode_toString(node.CvPtr, buf, buf.Capacity);
+            GC.KeepAlive(node);
             return buf.ToString();
         }
         
@@ -119,12 +108,13 @@ namespace OpenCvSharp
         /// <returns></returns>
         public static explicit operator Mat(FileNode node)
         {
-        	if (node == null)
-        		throw new ArgumentNullException("nameof(node)");
-        	node.ThrowIfDisposed();
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+            node.ThrowIfDisposed();
 
             var matrix = new Mat();
             NativeMethods.core_FileNode_toMat(node.CvPtr, matrix.CvPtr);
+            GC.KeepAlive(node);
             return matrix;
         }
 
@@ -139,11 +129,11 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileNode");
+                ThrowIfDisposed();
                 if (nodeName == null)
-                    throw new ArgumentNullException("nameof(nodeName)");
+                    throw new ArgumentNullException(nameof(nodeName));
                 IntPtr node = NativeMethods.core_FileNode_operatorThis_byString(ptr, nodeName);
+                GC.KeepAlive(this);
                 if (node == IntPtr.Zero)
                     return null;
                 return new FileNode(node);
@@ -157,9 +147,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileNode");
+                ThrowIfDisposed();
                 IntPtr node = NativeMethods.core_FileNode_operatorThis_byInt(ptr, i);
+                GC.KeepAlive(this);
                 if (node == IntPtr.Zero)
                     return null;
                 return new FileNode(node);
@@ -174,9 +164,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 int ret = NativeMethods.core_FileNode_empty(ptr);
+                GC.KeepAlive(this);
                 return ret != 0;
             }
         }
@@ -189,9 +179,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 int ret = NativeMethods.core_FileNode_isNone(ptr);
+                GC.KeepAlive(this);
                 return ret != 0;
             }
         }
@@ -204,9 +194,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 int ret = NativeMethods.core_FileNode_isSeq(ptr);
+                GC.KeepAlive(this);
                 return ret != 0;
             }
         }
@@ -219,9 +209,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 int ret = NativeMethods.core_FileNode_isMap(ptr);
+                GC.KeepAlive(this);
                 return ret != 0;
             }
         }
@@ -234,9 +224,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 int ret = NativeMethods.core_FileNode_isInt(ptr);
+                GC.KeepAlive(this);
                 return ret != 0;
             }
         }
@@ -249,9 +239,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 int ret = NativeMethods.core_FileNode_isReal(ptr);
+                GC.KeepAlive(this);
                 return ret != 0;
             }
         }
@@ -264,9 +254,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 int ret = NativeMethods.core_FileNode_isString(ptr);
+                GC.KeepAlive(this);
                 return ret != 0;
             }
         }
@@ -279,9 +269,9 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 int ret = NativeMethods.core_FileNode_isNamed(ptr);
+                GC.KeepAlive(this);
                 return ret != 0;
             }
         }
@@ -294,10 +284,10 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 var buf = new StringBuilder(1024);
                 NativeMethods.core_FileNode_name(ptr, buf, buf.Capacity);
+                GC.KeepAlive(this);
                 return buf.ToString();
             }
         }
@@ -310,15 +300,75 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
-                return NativeMethods.core_FileNode_size(ptr).ToInt64();
+                ThrowIfDisposed();
+                var res = NativeMethods.core_FileNode_size(ptr).ToInt64();
+                GC.KeepAlive(this);
+                return res;
+            }
+        }
+
+        /// <summary>
+        /// Returns type of the node.
+        /// </summary>
+        /// <returns>Type of the node.</returns>
+        public Types Type
+        {
+            get
+            {
+                ThrowIfDisposed();
+                var res = NativeMethods.core_FileNode_type(ptr);
+                GC.KeepAlive(this);
+                return (Types)res;
             }
         }
 
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// returns iterator pointing to the first node element
+        /// </summary>
+        /// <returns></returns>
+        public FileNodeIterator Begin()
+        {
+            ThrowIfDisposed();
+            IntPtr p = NativeMethods.core_FileNode_begin(ptr);
+            GC.KeepAlive(this);
+            return new FileNodeIterator(p);
+        }
+        //! 
+        /// <summary>
+        /// returns iterator pointing to the element following the last node element
+        /// </summary>
+        /// <returns></returns>
+        public FileNodeIterator End()
+        {
+            ThrowIfDisposed();
+            IntPtr p = NativeMethods.core_FileNode_end(ptr);
+            GC.KeepAlive(this);
+            return new FileNodeIterator(p);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<FileNode> GetEnumerator()
+        {
+            using (FileNodeIterator it = Begin(), end = End())
+            {
+                for (; !it.Equals(end); it.MoveNext())
+                {
+                    yield return it.Current;
+                }
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
         /// <summary>
         /// Reads node elements to the buffer with the specified format
@@ -328,22 +378,27 @@ namespace OpenCvSharp
         /// <param name="len"></param>
         public void ReadRaw(string fmt, IntPtr vec, long len)
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileNode");
+            ThrowIfDisposed();
             if (fmt == null)
-                throw new ArgumentNullException("nameof(fmt)");
+                throw new ArgumentNullException(nameof(fmt));
             NativeMethods.core_FileNode_readRaw(ptr, fmt, vec, new IntPtr(len));
+            GC.KeepAlive(this);
         }
 
         /// <summary>
-        /// Reads the registered object and returns pointer to it
+        /// Writes a comment.
+        /// The function writes a comment into file storage.The comments are skipped when the storage is read.
         /// </summary>
-        /// <returns></returns>
-        public IntPtr ReadObj()
+        /// <param name="comment">The written comment, single-line or multi-line</param>
+        /// <param name="append">If true, the function tries to put the comment at the end of current line.
+        /// Else if the comment is multi-line, or if it does not fit at the end of the current line, the comment starts a new line.</param>
+        public void WriteComment(string comment, bool append = false)
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileNode");
-            return NativeMethods.core_FileNode_readObj(ptr);
+            ThrowIfDisposed();
+            if (comment == null)
+                throw new ArgumentNullException(nameof(comment));
+            NativeMethods.core_FileStorage_writeComment(ptr, comment, append ? 1 : 0);
+            GC.KeepAlive(this);
         }
 
         #region Read
@@ -357,6 +412,7 @@ namespace OpenCvSharp
         {
             int value;
             NativeMethods.core_FileNode_read_int(ptr, out value, defaultValue);
+            GC.KeepAlive(this);
             return value;
         }
 
@@ -369,6 +425,7 @@ namespace OpenCvSharp
         {
             float value;
             NativeMethods.core_FileNode_read_float(ptr, out value, defaultValue);
+            GC.KeepAlive(this);
             return value;
         }
 
@@ -381,6 +438,7 @@ namespace OpenCvSharp
         {
             double value;
             NativeMethods.core_FileNode_read_double(ptr, out value, defaultValue);
+            GC.KeepAlive(this);
             return value;
         }
 
@@ -389,10 +447,11 @@ namespace OpenCvSharp
         /// </summary>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public string ReadString(string defaultValue = default(string))
+        public string ReadString(string defaultValue = null)
         {
             var value = new StringBuilder(65536);
             NativeMethods.core_FileNode_read_String(ptr, value, value.Capacity, defaultValue);
+            GC.KeepAlive(this);
             return value.ToString();
         }
 
@@ -407,6 +466,8 @@ namespace OpenCvSharp
             try
             {
                 NativeMethods.core_FileNode_read_Mat(ptr, value.CvPtr, Cv2.ToPtr(defaultMat));
+                GC.KeepAlive(this);
+                GC.KeepAlive(defaultMat);
             }
             catch
             {
@@ -427,6 +488,8 @@ namespace OpenCvSharp
             try
             {
                 NativeMethods.core_FileNode_read_SparseMat(ptr, value.CvPtr, Cv2.ToPtr(defaultMat));
+                GC.KeepAlive(this);
+                GC.KeepAlive(defaultMat);
             }
             catch
             {
@@ -445,6 +508,7 @@ namespace OpenCvSharp
             using (var valueVector = new VectorOfKeyPoint())
             {
                 NativeMethods.core_FileNode_read_vectorOfKeyPoint(ptr, valueVector.CvPtr);
+                GC.KeepAlive(this);
                 return valueVector.ToArray();
             }
         }
@@ -458,12 +522,567 @@ namespace OpenCvSharp
             using (var valueVector = new VectorOfDMatch())
             {
                 NativeMethods.core_FileNode_read_vectorOfDMatch(ptr, valueVector.CvPtr);
+                GC.KeepAlive(this);
                 return valueVector.ToArray();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Range ReadRange()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Range(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public KeyPoint ReadKeyPoint()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_KeyPoint(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public DMatch ReadDMatch()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_DMatch(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Point ReadPoint()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Point2i(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Point2f ReadPoint2f()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Point2f(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Point2d ReadPoint2d()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Point2d(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Point3i ReadPoint3i()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Point3i(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Point3f ReadPoint3f()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Point3f(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Point3d ReadPoint3d()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Point3d(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Size ReadSize()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Size2i(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Size2f ReadSize2f()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Size2f(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Size2d ReadSize2d()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Size2d(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Rect ReadRect()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Rect2i(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Rect2f ReadRect2f()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Rect2f(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Rect2d ReadRect2d()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Rect2d(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Scalar ReadScalar()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Scalar(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec2i ReadVec2i()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec2i(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec3i ReadVec3i()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec3i(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec4i ReadVec4i()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec4i(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec6i ReadVec6i()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec6i(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec2d ReadVec2d()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec2d(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec3d ReadVec3d()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec3d(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec4d ReadVec4d()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec4d(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec6d ReadVec6d()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec6d(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec2f ReadVec2f()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec2f(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec3f ReadVec3f()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec3f(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec4f ReadVec4f()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec4f(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec6f ReadVec6f()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec6f(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec2b ReadVec2b()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec2b(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec3b ReadVec3b()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec3b(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec4b ReadVec4b()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec4b(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec6b ReadVec6b()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec6b(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec2s ReadVec2s()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec2s(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec3s ReadVec3s()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec3s(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec4s ReadVec4s()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec4s(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec6s ReadVec6s()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec6s(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec2w ReadVec2w()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec2w(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec3w ReadVec3w()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec3w(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec4w ReadVec4w()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec4w(ptr);
+            GC.KeepAlive(this);
+            return ret;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Vec6w ReadVec6w()
+        {
+            ThrowIfDisposed();
+            var ret = NativeMethods.core_FileNode_read_Vec6w(ptr);
+            GC.KeepAlive(this);
+            return ret;
         }
 
         #endregion
 
         #endregion
+
+        /// <summary>
+        /// type of the file storage node
+        /// </summary>
+        [Flags]
+        public enum Types
+        {
+            /// <summary>
+            /// empty node
+            /// </summary>
+            None = 0,
+
+            /// <summary>
+            /// an integer
+            /// </summary>
+            Int = 1,
+
+            /// <summary>
+            /// floating-point number
+            /// </summary>
+            Real = 2,
+
+            /// <summary>
+            /// synonym or REAL
+            /// </summary>
+            Float = Real,
+
+            /// <summary>
+            /// text string in UTF-8 encoding
+            /// </summary>
+            Str = 3,
+
+            /// <summary>
+            /// synonym for STR
+            /// </summary>
+            String = Str,
+
+            /// <summary>
+            /// sequence
+            /// </summary>
+            Seq = 4,
+
+            /// <summary>
+            /// mapping
+            /// </summary>
+            Map = 5, 
+
+            /// <summary>
+            /// 
+            /// </summary>
+            TypeMask = 7,
+
+            /// <summary>
+            /// compact representation of a sequence or mapping. Used only by YAML writer
+            /// </summary>
+            Flow = 8,
+
+            /// <summary>
+            /// if set, means that all the collection elements are numbers of the same type (real's or int's).
+            /// UNIFORM is used only when reading FileStorage; FLOW is used only when writing. So they share the same bit
+            /// </summary>
+            Uniform = 8,  
+
+            /// <summary>
+            /// empty structure (sequence or mapping)
+            /// </summary>
+            Empty = 16,
+
+            /// <summary>
+            /// the node has a name (i.e. it is element of a mapping)
+            /// </summary>
+            Named = 32,
+        }
     }
 }

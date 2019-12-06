@@ -53,7 +53,7 @@ namespace OpenCvSharp
         public static explicit operator byte(RNG self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return (byte) self.Next();
         }
 
@@ -65,7 +65,7 @@ namespace OpenCvSharp
         public static explicit operator sbyte(RNG self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return (sbyte)self.Next();
         }
 
@@ -77,7 +77,7 @@ namespace OpenCvSharp
         public static explicit operator ushort(RNG self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return (ushort)self.Next();
         }
 
@@ -89,7 +89,7 @@ namespace OpenCvSharp
         public static explicit operator short(RNG self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return (short)self.Next();
         }
 
@@ -101,7 +101,7 @@ namespace OpenCvSharp
         public static explicit operator uint(RNG self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return self.Next();
         }
 
@@ -113,7 +113,7 @@ namespace OpenCvSharp
         public static explicit operator int(RNG self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return (int)self.Next();
         }
 
@@ -125,7 +125,7 @@ namespace OpenCvSharp
         public static explicit operator float(RNG self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return self.Next() * 2.3283064365386962890625e-10f; 
         }
 
@@ -137,7 +137,7 @@ namespace OpenCvSharp
         public static explicit operator double(RNG self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             uint t = self.Next();
             return (((ulong)t << 32) | self.Next()) * 5.4210108624275221700372640043497e-20;
         }
@@ -220,16 +220,19 @@ namespace OpenCvSharp
             bool saturateRange = false)
         {
             if (mat == null)
-                throw new ArgumentNullException("nameof(mat)");
+                throw new ArgumentNullException(nameof(mat));
             if (a == null)
-                throw new ArgumentNullException("nameof(a)");
+                throw new ArgumentNullException(nameof(a));
             if (b == null)
-                throw new ArgumentNullException("nameof(b)");
+                throw new ArgumentNullException(nameof(b));
             mat.ThrowIfNotReady();
             a.ThrowIfDisposed();
             b.ThrowIfDisposed();
             NativeMethods.core_RNG_fill(ref state, mat.CvPtr, (int) distType, a.CvPtr, b.CvPtr, saturateRange ? 1 : 0);
             mat.Fix();
+            GC.KeepAlive(mat);
+            GC.KeepAlive(a);
+            GC.KeepAlive(b);
         }
 
         /// <summary>

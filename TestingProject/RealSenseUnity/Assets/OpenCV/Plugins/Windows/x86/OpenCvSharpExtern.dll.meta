@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1099a2ff37b30c946b76383b3df68117
+guid: 59be5e3a76ba57748a449de30e9fdd55
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -12,41 +12,15 @@ PluginImporter:
   validateReferences: 1
   platformData:
   - first:
-      '': Linux
-    second:
-      enabled: 1
-      settings:
-        CPU: x86
-  - first:
-      '': LinuxUniversal
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      '': OSXIntel
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      '': OSXIntel64
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      '': SamsungTV
+      '': Any
     second:
       enabled: 0
       settings:
-        STV_MODEL: STANDARD_13
-  - first:
-      Android: Android
-    second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
+        Exclude Editor: 1
+        Exclude Linux64: 0
+        Exclude OSXUniversal: 0
+        Exclude Win: 0
+        Exclude Win64: 0
   - first:
       Any: 
     second:
@@ -63,7 +37,7 @@ PluginImporter:
   - first:
       Facebook: Win
     second:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: AnyCPU
   - first:
@@ -93,33 +67,9 @@ PluginImporter:
   - first:
       Standalone: Win64
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: None
-  - first:
-      Windows Store Apps: WindowsStoreApps
-    second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
-        DontProcess: False
-        PlaceholderPath: 
-        SDK: AnySDK
-        ScriptingBackend: AnyScriptingBackend
-  - first:
-      iPhone: iOS
-    second:
-      enabled: 0
-      settings:
-        CompileFlags: 
-        FrameworkDependencies: 
-  - first:
-      tvOS: tvOS
-    second:
-      enabled: 0
-      settings:
-        CompileFlags: 
-        FrameworkDependencies: 
   userData: 
   assetBundleName: 
   assetBundleVariant: 

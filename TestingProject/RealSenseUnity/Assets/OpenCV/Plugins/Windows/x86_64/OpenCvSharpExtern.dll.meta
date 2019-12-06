@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 98df94df70d3fea4d92a935454a590f2
+guid: 06e6fdf8351744d408a6d286af85abb8
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -12,41 +12,15 @@ PluginImporter:
   validateReferences: 1
   platformData:
   - first:
-      '': Linux
-    second:
-      enabled: 1
-      settings:
-        CPU: x86
-  - first:
-      '': LinuxUniversal
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      '': OSXIntel
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      '': OSXIntel64
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      '': SamsungTV
+      '': Any
     second:
       enabled: 0
       settings:
-        STV_MODEL: STANDARD_13
-  - first:
-      Android: Android
-    second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
+        Exclude Editor: 0
+        Exclude Linux64: 0
+        Exclude OSXUniversal: 0
+        Exclude Win: 0
+        Exclude Win64: 0
   - first:
       Any: 
     second:
@@ -69,7 +43,7 @@ PluginImporter:
   - first:
       Facebook: Win64
     second:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: AnyCPU
   - first:
@@ -87,7 +61,7 @@ PluginImporter:
   - first:
       Standalone: Win
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: None
   - first:
@@ -96,30 +70,6 @@ PluginImporter:
       enabled: 1
       settings:
         CPU: AnyCPU
-  - first:
-      Windows Store Apps: WindowsStoreApps
-    second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
-        DontProcess: False
-        PlaceholderPath: 
-        SDK: AnySDK
-        ScriptingBackend: AnyScriptingBackend
-  - first:
-      iPhone: iOS
-    second:
-      enabled: 0
-      settings:
-        CompileFlags: 
-        FrameworkDependencies: 
-  - first:
-      tvOS: tvOS
-    second:
-      enabled: 0
-      settings:
-        CompileFlags: 
-        FrameworkDependencies: 
   userData: 
   assetBundleName: 
   assetBundleVariant: 

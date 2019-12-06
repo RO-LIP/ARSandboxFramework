@@ -20,7 +20,7 @@ namespace OpenCvSharp
         public static KeyPoint[] FAST(InputArray image, int threshold, bool nonmaxSupression = true)
         {
             if (image == null)
-                throw new ArgumentNullException("nameof(image)");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfDisposed();
 
             using (var kp = new VectorOfKeyPoint())
@@ -44,7 +44,7 @@ namespace OpenCvSharp
         public static KeyPoint[] FAST(InputArray image, int threshold, bool nonmaxSupression, FASTType type)
         {
             if (image == null)
-                throw new ArgumentNullException("nameof(image)");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfDisposed();
 
             using (var kp = new VectorOfKeyPoint())
@@ -65,10 +65,10 @@ namespace OpenCvSharp
         /// detected corners (keypoints).</param>
         /// <param name="type">one of the four neighborhoods as defined in the paper</param>
         /// <returns>keypoints detected on the image.</returns>
-        public static KeyPoint[] AGAST(InputArray image, int threshold, bool nonmaxSuppression, AGASTType type)
+        public static KeyPoint[] AGAST(InputArray image, int threshold, bool nonmaxSuppression, AgastFeatureDetector.DetectorType type)
         {
             if (image == null)
-                throw new ArgumentNullException("nameof(image)");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfDisposed();
             
             using (var vector = new VectorOfKeyPoint())
@@ -92,11 +92,11 @@ namespace OpenCvSharp
             Scalar? color = null, DrawMatchesFlags flags = DrawMatchesFlags.Default)
         {
             if (image == null)
-                throw new ArgumentNullException("nameof(image)");
+                throw new ArgumentNullException(nameof(image));
             if (outImage == null)
-                throw new ArgumentNullException("nameof(outImage)");
+                throw new ArgumentNullException(nameof(outImage));
             if (keypoints == null)
-                throw new ArgumentNullException("nameof(keypoints)");
+                throw new ArgumentNullException(nameof(keypoints));
             image.ThrowIfDisposed();
             outImage.ThrowIfDisposed();
 
@@ -104,10 +104,12 @@ namespace OpenCvSharp
             Scalar color0 = color.GetValueOrDefault(Scalar.All(-1));
             NativeMethods.features2d_drawKeypoints(image.CvPtr, keypointsArray, keypointsArray.Length,
                 outImage.CvPtr, color0, (int)flags);
+            GC.KeepAlive(image);
+            GC.KeepAlive(outImage);
         }
 
         /// <summary>
-        /// Draws matches of keypints from two images on output image.
+        /// Draws matches of keypoints from two images on output image.
         /// </summary>
         /// <param name="img1"></param>
         /// <param name="keypoints1"></param>
@@ -119,24 +121,30 @@ namespace OpenCvSharp
         /// <param name="singlePointColor"></param>
         /// <param name="matchesMask"></param>
         /// <param name="flags"></param>
-        public static void DrawMatches(Mat img1, IEnumerable<KeyPoint> keypoints1,
-            Mat img2, IEnumerable<KeyPoint> keypoints2,
-            IEnumerable<DMatch> matches1To2, Mat outImg,
-            Scalar? matchColor = null, Scalar? singlePointColor = null,
-            IEnumerable<byte> matchesMask = null, DrawMatchesFlags flags = DrawMatchesFlags.Default)
+        public static void DrawMatches(
+            Mat img1, 
+            IEnumerable<KeyPoint> keypoints1,
+            Mat img2,
+            IEnumerable<KeyPoint> keypoints2,
+            IEnumerable<DMatch> matches1To2,
+            Mat outImg,
+            Scalar? matchColor = null,
+            Scalar? singlePointColor = null,
+            IEnumerable<byte> matchesMask = null,
+            DrawMatchesFlags flags = DrawMatchesFlags.Default)
         {
             if (img1 == null)
-                throw new ArgumentNullException("nameof(img1)");
+                throw new ArgumentNullException(nameof(img1));
             if (img2 == null)
-                throw new ArgumentNullException("nameof(img2)");
+                throw new ArgumentNullException(nameof(img2));
             if (outImg == null)
-                throw new ArgumentNullException("nameof(outImg)");
+                throw new ArgumentNullException(nameof(outImg));
             if (keypoints1 == null)
-                throw new ArgumentNullException("nameof(keypoints1)");
+                throw new ArgumentNullException(nameof(keypoints1));
             if (keypoints2 == null)
-                throw new ArgumentNullException("nameof(keypoints2)");
+                throw new ArgumentNullException(nameof(keypoints2));
             if (matches1To2 == null)
-                throw new ArgumentNullException("nameof(matches1To2)");
+                throw new ArgumentNullException(nameof(matches1To2));
             img1.ThrowIfDisposed();
             img2.ThrowIfDisposed();
             outImg.ThrowIfDisposed();
@@ -159,6 +167,9 @@ namespace OpenCvSharp
                 img2.CvPtr, keypoints2Array, keypoints2Array.Length,
                 matches1To2Array, matches1To2Array.Length, outImg.CvPtr,
                 matchColor0, singlePointColor0, matchesMaskArray, matchesMaskLength, (int)flags);
+            GC.KeepAlive(img1);
+            GC.KeepAlive(img2);
+            GC.KeepAlive(outImg);
         }
 
         /// <summary>
@@ -182,29 +193,25 @@ namespace OpenCvSharp
             DrawMatchesFlags flags = DrawMatchesFlags.Default)
         {
             if (img1 == null)
-                throw new ArgumentNullException("nameof(img1)");
+                throw new ArgumentNullException(nameof(img1));
             if (img2 == null)
-                throw new ArgumentNullException("nameof(img2)");
+                throw new ArgumentNullException(nameof(img2));
             if (outImg == null)
-                throw new ArgumentNullException("nameof(outImg)");
+                throw new ArgumentNullException(nameof(outImg));
             if (keypoints1 == null)
-                throw new ArgumentNullException("nameof(keypoints1)");
+                throw new ArgumentNullException(nameof(keypoints1));
             if (keypoints2 == null)
-                throw new ArgumentNullException("nameof(keypoints2)");
+                throw new ArgumentNullException(nameof(keypoints2));
             if (matches1To2 == null)
-                throw new ArgumentNullException("nameof(matches1To2)");
+                throw new ArgumentNullException(nameof(matches1To2));
             img1.ThrowIfDisposed();
             img2.ThrowIfDisposed();
             outImg.ThrowIfDisposed();
 
             KeyPoint[] keypoints1Array = EnumerableEx.ToArray(keypoints1);
             KeyPoint[] keypoints2Array = EnumerableEx.ToArray(keypoints2);
-
-			//UFIX
-            //DMatch[][] matches1To2Array = EnumerableEx.SelectToArray(matches1To2, EnumerableEx.ToArray);
-			DMatch[][] matches1To2Array = EnumerableEx.SelectToArray<IEnumerable<DMatch>,DMatch[]>(matches1To2, EnumerableEx.ToArray);
-
-			int matches1To2Size1 = matches1To2Array.Length;
+            DMatch[][] matches1To2Array = EnumerableEx.SelectToArray(matches1To2, EnumerableEx.ToArray);
+            int matches1To2Size1 = matches1To2Array.Length;
             int[] matches1To2Size2 = EnumerableEx.SelectToArray(matches1To2Array, dm => dm.Length);
             Scalar matchColor0 = matchColor.GetValueOrDefault(Scalar.All(-1));
             Scalar singlePointColor0 = singlePointColor.GetValueOrDefault(Scalar.All(-1));
@@ -221,11 +228,8 @@ namespace OpenCvSharp
                 }
                 else
                 {
-					//UFIX
-                    //byte[][] matchesMaskArray = EnumerableEx.SelectToArray(matchesMask, EnumerableEx.ToArray);
-					byte[][] matchesMaskArray = EnumerableEx.SelectToArray<IEnumerable<byte>,byte[]>(matchesMask, EnumerableEx.ToArray);
-
-					int matchesMaskSize1 = matches1To2Array.Length;
+                    byte[][] matchesMaskArray = EnumerableEx.SelectToArray(matchesMask, EnumerableEx.ToArray);
+                    int matchesMaskSize1 = matches1To2Array.Length;
                     int[] matchesMaskSize2 = EnumerableEx.SelectToArray(matchesMaskArray, dm => dm.Length);
                     using (var matchesMaskPtr = new ArrayAddress2<byte>(matchesMaskArray))
                     {
@@ -236,6 +240,9 @@ namespace OpenCvSharp
                             matchesMaskPtr, matchesMaskSize1, matchesMaskSize2, (int)flags);
                     }
                 }
+                GC.KeepAlive(img1);
+                GC.KeepAlive(img2);
+                GC.KeepAlive(outImg);
             }
         }
 
@@ -255,15 +262,15 @@ namespace OpenCvSharp
             out float repeatability, out int correspCount)
         {
             if (img1 == null) 
-                throw new ArgumentNullException("nameof(img1)");
+                throw new ArgumentNullException(nameof(img1));
             if (img2 == null) 
-                throw new ArgumentNullException("nameof(img2)");
+                throw new ArgumentNullException(nameof(img2));
             if (H1to2 == null) 
-                throw new ArgumentNullException("nameof(H1to2)");
+                throw new ArgumentNullException(nameof(H1to2));
             if (keypoints1 == null) 
-                throw new ArgumentNullException("nameof(keypoints1)");
+                throw new ArgumentNullException(nameof(keypoints1));
             if (keypoints2 == null) 
-                throw new ArgumentNullException("nameof(keypoints2)");
+                throw new ArgumentNullException(nameof(keypoints2));
 
             using (var keypoints1Vec = new VectorOfKeyPoint(keypoints1))
             using (var keypoints2Vec = new VectorOfKeyPoint(keypoints2))
@@ -272,6 +279,9 @@ namespace OpenCvSharp
                     img1.CvPtr, img2.CvPtr, H1to2.CvPtr,
                     keypoints1Vec.CvPtr, keypoints2Vec.CvPtr, 
                     out repeatability, out correspCount);
+                GC.KeepAlive(img1);
+                GC.KeepAlive(img2);
+                GC.KeepAlive(H1to2);
                 keypoints1 = keypoints1Vec.ToArray();
                 keypoints2 = keypoints2Vec.ToArray();
             }
@@ -287,9 +297,9 @@ namespace OpenCvSharp
             DMatch[][] matches1to2, byte[][] correctMatches1to2Mask)
         {
             if (matches1to2 == null)
-                throw new ArgumentNullException("nameof(matches1to2)");
+                throw new ArgumentNullException(nameof(matches1to2));
             if (correctMatches1to2Mask == null)
-                throw new ArgumentNullException("nameof(correctMatches1to2Mask)");
+                throw new ArgumentNullException(nameof(correctMatches1to2Mask));
 
             using (var dm = new ArrayAddress2<DMatch>(matches1to2))
             using (var cm = new ArrayAddress2<byte>(correctMatches1to2Mask))
@@ -313,7 +323,7 @@ namespace OpenCvSharp
             IEnumerable<Point2f> recallPrecisionCurve, float lPrecision)
         {
             if (recallPrecisionCurve == null)
-                throw new ArgumentNullException("nameof(recallPrecisionCurve)");
+                throw new ArgumentNullException(nameof(recallPrecisionCurve));
 
             var array = EnumerableEx.ToArray(recallPrecisionCurve);
             return NativeMethods.features2d_getRecall(array, array.Length, lPrecision);
@@ -329,7 +339,7 @@ namespace OpenCvSharp
             IEnumerable<Point2f> recallPrecisionCurve, float lPrecision)
         {
             if (recallPrecisionCurve == null)
-                throw new ArgumentNullException("nameof(recallPrecisionCurve)");
+                throw new ArgumentNullException(nameof(recallPrecisionCurve));
             var array = EnumerableEx.ToArray(recallPrecisionCurve);
             return NativeMethods.features2d_getNearestPoint(array, array.Length, lPrecision);
         }

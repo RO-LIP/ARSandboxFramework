@@ -7,7 +7,6 @@ namespace OpenCvSharp
 {
     static partial class NativeMethods
     {
-
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern IntPtr aruco_getPredefinedDictionary(int name);
 
@@ -24,10 +23,7 @@ namespace OpenCvSharp
         public static extern void aruco_drawMarker(IntPtr dictionary, int id, int sidePixels, IntPtr mat, int borderBits);
 
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void aruco_drawAxis(IntPtr image, IntPtr cameraMatrix,
-                                         double[] distCoeffs, int distCoeffsLength,
-                                         double[] rvec, double[] tvec,
-                                         float lenght);
+        public static extern void aruco_estimatePoseSingleMarkers([MarshalAs(UnmanagedType.LPArray)] IntPtr[] corners, int cornersLength1, int[] cornersLengths2, float markerLength, IntPtr cameraMatrix, IntPtr distCoeffs, IntPtr rvecs, IntPtr tvecs, IntPtr objPoints);
 
         #region DetectorParameters
 
@@ -71,9 +67,11 @@ namespace OpenCvSharp
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void aruco_DetectorParameters_setAdaptiveThreshWinSizeStep(IntPtr obj, int value);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void aruco_DetectorParameters_setCornerRefinementMaxIterations(IntPtr obj, int value);
+        public static extern void aruco_DetectorParameters_setCornerRefinementMethod(IntPtr obj, int value);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void aruco_DetectorParameters_setCornerRefinementWinSize(IntPtr obj, int value);
+        [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void aruco_DetectorParameters_setCornerRefinementMaxIterations(IntPtr obj, int value);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void aruco_DetectorParameters_setMarkerBorderBits(IntPtr obj, int value);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
@@ -114,6 +112,8 @@ namespace OpenCvSharp
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern int aruco_DetectorParameters_getCornerRefinementMaxIterations(IntPtr obj);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern int aruco_DetectorParameters_getCornerRefinementMethod(IntPtr obj);
+        [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern int aruco_DetectorParameters_getCornerRefinementWinSize(IntPtr obj);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern int aruco_DetectorParameters_getMarkerBorderBits(IntPtr obj);
@@ -145,7 +145,6 @@ namespace OpenCvSharp
         public static extern int aruco_Dictionary_getMaxCorrectionBits(IntPtr obj);
 
         #endregion
-
     }
 
 }

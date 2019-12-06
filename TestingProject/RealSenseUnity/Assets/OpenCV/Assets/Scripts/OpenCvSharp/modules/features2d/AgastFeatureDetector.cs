@@ -15,27 +15,25 @@ namespace OpenCvSharp
 #endif
     public class AgastFeatureDetector : Feature2D
     {
-        private bool disposed;
-        internal Ptr<AgastFeatureDetector> ptrObj;
+        private Ptr ptrObj;
+
+        //internal override IntPtr PtrObj => ptrObj.CvPtr;
 
 #pragma warning disable 1591
         public const int
-            AGAST_5_8 = 0,
-            AGAST_7_12d = 1,
-            AGAST_7_12s = 2,
-            OAST_9_16 = 3,
             THRESHOLD = 10000,
             NONMAX_SUPPRESSION = 10001;
 #pragma warning restore 1591
+
         #region Init & Disposal
 
         /// <summary>
         /// 
         /// </summary>
-        internal AgastFeatureDetector(Ptr<AgastFeatureDetector> p)
-			: base(p.Get())
+        protected AgastFeatureDetector(IntPtr p)
         {
-			ptrObj = p;
+            ptrObj = new Ptr(p);
+            ptr = ptrObj.Get();
         }
 
         /// <summary>
@@ -45,57 +43,26 @@ namespace OpenCvSharp
         /// and pixels of a circle around this pixel.</param>
         /// <param name="nonmaxSuppression">if true, non-maximum suppression is applied to detected corners (keypoints).</param>
         /// <param name="type"></param>
-        public static AgastFeatureDetector Create( int threshold=10,
-                                                     bool nonmaxSuppression=true,
-                                                     AGASTType type = AGASTType.OAST_9_16)
+        public static AgastFeatureDetector Create(
+            int threshold = 10,
+            bool nonmaxSuppression = true,
+            DetectorType type = DetectorType.OAST_9_16)
         {
             IntPtr ptr = NativeMethods.features2d_AgastFeatureDetector_create(
-                threshold, nonmaxSuppression ? 1 : 0, (int)type);
-            return new AgastFeatureDetector(new Ptr<AgastFeatureDetector>(ptr));
+                threshold, nonmaxSuppression ? 1 : 0, (int) type);
+            return new AgastFeatureDetector(ptr);
         }
 
-#if LANG_JP
-    /// <summary>
-    /// リソースの解放
-    /// </summary>
-    /// <param name="disposing">
-    /// trueの場合は、このメソッドがユーザコードから直接が呼ばれたことを示す。マネージ・アンマネージ双方のリソースが解放される。
-    /// falseの場合は、このメソッドはランタイムからファイナライザによって呼ばれ、もうほかのオブジェクトから参照されていないことを示す。アンマネージリソースのみ解放される。
-    ///</param>
-#else
         /// <summary>
-        /// Releases the resources
+        /// Releases managed resources
         /// </summary>
-        /// <param name="disposing">
-        /// If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged resources can be disposed.
-        /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
-        /// </param>
-#endif
-        protected override void Dispose(bool disposing)
+        protected override void DisposeManaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    // releases managed resources
-                    if (disposing)
-                    {
-                        if (ptrObj != null)
-                        {
-                            ptrObj.Dispose();
-                            ptrObj = null;
-                        }
-                    }
-                    // releases unmanaged resources
-                    ptr = IntPtr.Zero;
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            ptrObj?.Dispose();
+            ptrObj = null;
+            base.DisposeManaged();
         }
+
         #endregion
 
         #region Properties
@@ -107,15 +74,16 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
-                return NativeMethods.features2d_AgastFeatureDetector_getThreshold(ptr);
+                ThrowIfDisposed();
+                var res = NativeMethods.features2d_AgastFeatureDetector_getThreshold(ptr);
+                GC.KeepAlive(this);
+                return res;
             }
             set
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
+                ThrowIfDisposed();
                 NativeMethods.features2d_AgastFeatureDetector_setThreshold(ptr, value);
+                GC.KeepAlive(this);
             }
         }
 
@@ -126,41 +94,72 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
-                return NativeMethods.features2d_AgastFeatureDetector_getNonmaxSuppression(ptr);
+                ThrowIfDisposed();
+                var res = NativeMethods.features2d_AgastFeatureDetector_getNonmaxSuppression(ptr);
+                GC.KeepAlive(this);
+                return res;
             }
             set
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
+                ThrowIfDisposed();
                 NativeMethods.features2d_AgastFeatureDetector_setNonmaxSuppression(ptr, value);
+                GC.KeepAlive(this);
             }
         }
 
         /// <summary>
         /// type one of the four neighborhoods as defined in the paper
         /// </summary>
-        public AGASTType Type
+        public DetectorType Type
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
-                return (AGASTType)NativeMethods.features2d_AgastFeatureDetector_getType(ptr);
+                ThrowIfDisposed();
+                var res = (DetectorType)NativeMethods.features2d_AgastFeatureDetector_getType(ptr);
+                GC.KeepAlive(this);
+                return res;
             }
             set
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
+                ThrowIfDisposed();
                 NativeMethods.features2d_AgastFeatureDetector_setType(ptr, (int)value);
+                GC.KeepAlive(this);
             }
         }
-        
-        #endregion
-
-        #region Methods
 
         #endregion
+
+        internal class Ptr : OpenCvSharp.Ptr
+        {
+            public Ptr(IntPtr ptr) : base(ptr)
+            {
+            }
+
+            public override IntPtr Get()
+            {
+                var res = NativeMethods.features2d_Ptr_AgastFeatureDetector_get(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                NativeMethods.features2d_Ptr_AgastFeatureDetector_delete(ptr);
+                base.DisposeUnmanaged();
+            }
+        }
+
+#pragma warning disable 1591
+
+        /// <summary>
+        /// AGAST type one of the four neighborhoods as defined in the paper
+        /// </summary>
+        public enum DetectorType : int
+        {
+            AGAST_5_8 = 0,
+            AGAST_7_12d = 1,
+            AGAST_7_12s = 2,
+            OAST_9_16 = 3,
+        }
     }
 }

@@ -17,9 +17,11 @@ namespace OpenCvSharp
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
             if (fs == null)
-                throw new ArgumentNullException("nameof(fs)");
+                throw new ArgumentNullException(nameof(fs));
 
             NativeMethods.core_Algorithm_write(ptr, fs.CvPtr);
+            GC.KeepAlive(this);
+            GC.KeepAlive(fs);
         }
 
         /// <summary>
@@ -31,9 +33,11 @@ namespace OpenCvSharp
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
             if (fn == null)
-                throw new ArgumentNullException("nameof(fn)");
+                throw new ArgumentNullException(nameof(fn));
 
             NativeMethods.core_Algorithm_read(ptr, fn.CvPtr);
+            GC.KeepAlive(this);
+            GC.KeepAlive(fn);
         }
 
         /// <summary>
@@ -47,7 +51,9 @@ namespace OpenCvSharp
                 if (ptr == IntPtr.Zero)
                     throw new ObjectDisposedException(GetType().Name);
 
-                return NativeMethods.core_Algorithm_empty(ptr) != 0;
+                var res = NativeMethods.core_Algorithm_empty(ptr) != 0;
+                GC.KeepAlive(this);
+                return res;
             }
         }
 
@@ -62,9 +68,10 @@ namespace OpenCvSharp
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
             if (filename == null)
-                throw new ArgumentNullException("nameof(filename)");
+                throw new ArgumentNullException(nameof(filename));
 
             NativeMethods.core_Algorithm_save(ptr, filename);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -73,13 +80,14 @@ namespace OpenCvSharp
         /// is saved to a file or string.
         /// </summary>
         /// <returns></returns>
-        public virtual String GetDefaultName()
+        public virtual string GetDefaultName()
         {
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
 
             var buf = new StringBuilder(1024);
             NativeMethods.core_Algorithm_getDefaultName(ptr, buf, buf.Capacity);
+            GC.KeepAlive(this);
             return buf.ToString();
         }
     }

@@ -40,18 +40,22 @@ namespace OpenCvSharp.ML
         {
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
-            return NativeMethods.ml_StatModel_getVarCount(ptr);
+            var res = NativeMethods.ml_StatModel_getVarCount(ptr);
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual new bool Empty()
+        public new virtual bool Empty()
         {
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
-            return NativeMethods.ml_StatModel_empty(ptr) != 0;
+            var res = NativeMethods.ml_StatModel_empty(ptr) != 0;
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
@@ -62,7 +66,9 @@ namespace OpenCvSharp.ML
         {
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
-            return NativeMethods.ml_StatModel_isTrained(ptr) != 0;
+            var res = NativeMethods.ml_StatModel_isTrained(ptr) != 0;
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
@@ -73,7 +79,9 @@ namespace OpenCvSharp.ML
         {
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
-            return NativeMethods.ml_StatModel_isClassifier(ptr) != 0;
+            var res = NativeMethods.ml_StatModel_isClassifier(ptr) != 0;
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
@@ -100,14 +108,15 @@ namespace OpenCvSharp.ML
         {
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
-            if (samples == null) 
-                throw new ArgumentNullException("nameof(samples)");
+            if (samples == null)
+                throw new ArgumentNullException(nameof(samples));
             if (responses == null)
-                throw new ArgumentNullException("nameof(responses)");
+                throw new ArgumentNullException(nameof(responses));
             samples.ThrowIfDisposed();
             responses.ThrowIfDisposed();
 
             int ret = NativeMethods.ml_StatModel_train2(ptr, samples.CvPtr, (int)layout, responses.CvPtr);
+            GC.KeepAlive(this);
             GC.KeepAlive(samples);
             GC.KeepAlive(responses);
             return ret != 0;
@@ -142,15 +151,16 @@ namespace OpenCvSharp.ML
             if (ptr == IntPtr.Zero)
                 throw new ObjectDisposedException(GetType().Name);
             if (samples == null)
-                throw new ArgumentNullException("nameof(samples)");
+                throw new ArgumentNullException(nameof(samples));
             samples.ThrowIfDisposed();
-            if (results!=null)
+            if (results != null)
                 results.ThrowIfNotReady();
 
             float ret = NativeMethods.ml_StatModel_predict(
                 ptr, samples.CvPtr, Cv2.ToPtr(results), (int)flags);
-            
+            GC.KeepAlive(this);
             GC.KeepAlive(samples);
+            GC.KeepAlive(results);
             if (results != null)
                 results.Fix();
             return ret;
@@ -171,7 +181,7 @@ namespace OpenCvSharp.ML
             /// <summary>
             /// makes the method return the raw results (the sum), not the class label
             /// </summary>
-            RawOutput = 1, 
+            RawOutput = 1,
             CompressedInput = 2,
             PreprocessedInput = 4
 #pragma warning restore 1591

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using OpenCvSharp.Util;
 
 namespace OpenCvSharp
 {
@@ -11,8 +12,6 @@ namespace OpenCvSharp
     /// </summary>
     public class FileStorage : DisposableCvObject
     {
-        private bool disposed;
-
         #region Init & Disposal
 
         /// <summary>
@@ -40,41 +39,23 @@ namespace OpenCvSharp
         public FileStorage(string source, Mode flags, string encoding = null)
         {
             if (source == null)
-                throw new ArgumentNullException("nameof(source)");
+                throw new ArgumentNullException(nameof(source));
             ptr = NativeMethods.core_FileStorage_new2(source, (int)flags, encoding);
         }
 
         /// <summary>
-        /// 
+        /// Releases unmanaged resources
         /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeUnmanaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    if (disposing)
-                    {
-                    }
-                    if (ptr != IntPtr.Zero)
-                    {
-                        NativeMethods.core_FileStorage_delete(ptr);
-                        ptr = IntPtr.Zero;
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            NativeMethods.core_FileStorage_delete(ptr);
+            base.DisposeUnmanaged();
         }
 
         #endregion
 
         #region Properties
-        
+
         /// <summary>
         /// Returns the specified element of the top-level mapping
         /// </summary>
@@ -84,11 +65,11 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 if (nodeName == null)
-                    throw new ArgumentNullException("nameof(nodeName)");
+                    throw new ArgumentNullException(nameof(nodeName));
                 IntPtr node = NativeMethods.core_FileStorage_indexer(ptr, nodeName);
+                GC.KeepAlive(this);
                 if (node == IntPtr.Zero)
                     return null;
                 return new FileNode(node);
@@ -102,46 +83,30 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
+                ThrowIfDisposed();
                 unsafe
                 {
                     sbyte* buf = NativeMethods.core_FileStorage_elname(ptr);
                     if (buf == null)
                         return null;
-                    return new string(buf);
+                    var res = StringHelper.PtrToStringAnsi(buf); ;
+                    GC.KeepAlive(this);
+                    return res;
                 }
-            }
-        }
-
-        /// <summary>
-        /// the stack of written structures
-        /// </summary>
-        public byte[] Structs
-        {
-            get
-            {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
-
-                IntPtr length;
-                IntPtr buf = NativeMethods.core_FileStorage_structs(ptr, out length);
-                byte[] result = new byte[length.ToInt32()];
-                Marshal.Copy(buf, result, 0, result.Length);
-                return result;
             }
         }
 
         /// <summary>
         /// the writer state
         /// </summary>
-        public int State
+        public States State
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException("FileStorage");
-                return NativeMethods.core_FileStorage_state(ptr);
+                ThrowIfDisposed();
+                var res = NativeMethods.core_FileStorage_state(ptr);
+                GC.KeepAlive(this);
+                return (States)res;
             }
         }
 
@@ -159,11 +124,11 @@ namespace OpenCvSharp
         /// <returns></returns>
         public virtual bool Open(string fileName, Mode flags, string encoding = null)
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileStorage");
+            ThrowIfDisposed();
             if (fileName == null)
-                throw new ArgumentNullException("nameof(fileName)");
+                throw new ArgumentNullException(nameof(fileName));
             int ret = NativeMethods.core_FileStorage_open(ptr, fileName, (int)flags, encoding);
+            GC.KeepAlive(this);
             return ret != 0;
         }
 
@@ -173,9 +138,10 @@ namespace OpenCvSharp
         /// <returns></returns>
         public virtual bool IsOpened()
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileStorage");
-            return NativeMethods.core_FileStorage_isOpened(ptr) != 0;
+            ThrowIfDisposed();
+            var res = NativeMethods.core_FileStorage_isOpened(ptr) != 0;
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
@@ -183,8 +149,7 @@ namespace OpenCvSharp
         /// </summary>
         public virtual void Release()
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileStorage");
+            ThrowIfDisposed();
             Dispose();
         }
 
@@ -194,13 +159,20 @@ namespace OpenCvSharp
         /// <returns></returns>
         public string ReleaseAndGetString()
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileStorage");
-            var buf = new StringBuilder(1 << 16);
-            NativeMethods.core_FileStorage_releaseAndGetString(ptr, buf, buf.Capacity);
-            ptr = IntPtr.Zero;
-            Dispose();
-            return buf.ToString();
+            ThrowIfDisposed();
+           
+            try
+            {
+                using (var stdString = new StdString())
+                {
+                    NativeMethods.core_FileStorage_releaseAndGetString_stdString(ptr, stdString.CvPtr);
+                    return stdString.ToString();
+                }
+            }
+            finally
+            {
+                Dispose();
+            }
         }
 
         /// <summary>
@@ -209,9 +181,9 @@ namespace OpenCvSharp
         /// <returns></returns>
         public FileNode GetFirstTopLevelNode()
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileStorage");
+            ThrowIfDisposed();
             IntPtr node = NativeMethods.core_FileStorage_getFirstTopLevelNode(ptr);
+            GC.KeepAlive(this);
             if (node == IntPtr.Zero)
                 return null;
             return new FileNode(node);
@@ -220,13 +192,13 @@ namespace OpenCvSharp
         /// <summary>
         /// Returns the top-level mapping. YAML supports multiple streams
         /// </summary>
-        /// <param name="streamidx"></param>
+        /// <param name="streamIdx"></param>
         /// <returns></returns>
-        public FileNode Root(int streamidx = 0)
+        public FileNode Root(int streamIdx = 0)
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileStorage");
-            IntPtr node = NativeMethods.core_FileStorage_root(ptr, streamidx);
+            ThrowIfDisposed();
+            IntPtr node = NativeMethods.core_FileStorage_root(ptr, streamIdx);
+            GC.KeepAlive(this);
             if (node == IntPtr.Zero)
                 return null;
             return new FileNode(node);
@@ -240,22 +212,31 @@ namespace OpenCvSharp
         /// <param name="len"></param>
         public void WriteRaw(string fmt, IntPtr vec, long len)
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileStorage");
+            ThrowIfDisposed();
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Writes the registered C structure (CvMat, CvMatND, CvSeq). See cvWrite()
+        /// 
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="obj"></param>
-        public void WriteObj(string name, IntPtr obj)
+        /// <param name="flags"></param>
+        /// <param name="typeName"></param>
+        public void StartWriteStruct(string name, int flags, string typeName)
         {
-            if (disposed)
-                throw new ObjectDisposedException("FileStorage");
-            if (name == null)
-                throw new ArgumentNullException("nameof(name)");
-            NativeMethods.core_FileStorage_writeObj(ptr, name, obj);
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_startWriteStruct(ptr, name, flags, typeName);
+            GC.KeepAlive(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void EndWriteStruct()
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_endWriteStruct(ptr);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -266,7 +247,7 @@ namespace OpenCvSharp
         public static string GetDefaultObjectName(string fileName)
         {
             if (fileName == null)
-                throw new ArgumentNullException("nameof(fileName)");
+                throw new ArgumentNullException(nameof(fileName));
             if (!File.Exists(fileName))
                 throw new FileNotFoundException("", fileName);
 
@@ -284,9 +265,11 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void Write(string name, int value)
         {
+            ThrowIfDisposed();
             if (name == null)
-                throw new ArgumentNullException("nameof(name)");
+                throw new ArgumentNullException(nameof(name));
             NativeMethods.core_FileStorage_write_int(ptr, name, value);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -296,9 +279,11 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void Write(string name, float value)
         {
+            ThrowIfDisposed();
             if (name == null)
-                throw new ArgumentNullException("nameof(name)");
+                throw new ArgumentNullException(nameof(name));
             NativeMethods.core_FileStorage_write_float(ptr, name, value);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -308,9 +293,11 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void Write(string name, double value)
         {
+            ThrowIfDisposed();
             if (name == null)
-                throw new ArgumentNullException("nameof(name)");
+                throw new ArgumentNullException(nameof(name));
             NativeMethods.core_FileStorage_write_double(ptr, name, value);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -320,11 +307,13 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void Write(string name, string value)
         {
+            ThrowIfDisposed();
             if (name == null)
-                throw new ArgumentNullException("nameof(name)");
+                throw new ArgumentNullException(nameof(name));
             if (value == null)
-                throw new ArgumentNullException("nameof(value)");
+                throw new ArgumentNullException(nameof(value));
             NativeMethods.core_FileStorage_write_String(ptr, name, value);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -334,11 +323,13 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void Write(string name, Mat value)
         {
+            ThrowIfDisposed();
             if (name == null)
-                throw new ArgumentNullException("nameof(name)");
+                throw new ArgumentNullException(nameof(name));
             if (value == null)
-                throw new ArgumentNullException("nameof(value)");
+                throw new ArgumentNullException(nameof(value));
             NativeMethods.core_FileStorage_write_Mat(ptr, name, value.CvPtr);
+            GC.KeepAlive(this);
             GC.KeepAlive(value);
         }
 
@@ -349,11 +340,13 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void Write(string name, SparseMat value)
         {
+            ThrowIfDisposed();
             if (name == null)
-                throw new ArgumentNullException("nameof(name)");
+                throw new ArgumentNullException(nameof(name));
             if (value == null)
-                throw new ArgumentNullException("nameof(value)");
+                throw new ArgumentNullException(nameof(value));
             NativeMethods.core_FileStorage_write_SparseMat(ptr, name, value.CvPtr);
+            GC.KeepAlive(this);
             GC.KeepAlive(value);
         }
 
@@ -364,13 +357,15 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void Write(string name, IEnumerable<KeyPoint> value)
         {
+            ThrowIfDisposed();
             if (name == null)
-                throw new ArgumentNullException("nameof(name)");
+                throw new ArgumentNullException(nameof(name));
             if (value == null)
-                throw new ArgumentNullException("nameof(value)");
+                throw new ArgumentNullException(nameof(value));
             using (var valueVector = new VectorOfKeyPoint(value))
             {
                 NativeMethods.core_FileStorage_write_vectorOfKeyPoint(ptr, name, valueVector.CvPtr);
+                GC.KeepAlive(this);
             }
         }
 
@@ -381,13 +376,15 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void Write(string name, IEnumerable<DMatch> value)
         {
+            ThrowIfDisposed();
             if (name == null)
-                throw new ArgumentNullException("nameof(name)");
+                throw new ArgumentNullException(nameof(name));
             if (value == null)
-                throw new ArgumentNullException("nameof(value)");
+                throw new ArgumentNullException(nameof(value));
             using (var valueVector = new VectorOfDMatch(value))
             {
                 NativeMethods.core_FileStorage_write_vectorOfDMatch(ptr, name, valueVector.CvPtr);
+                GC.KeepAlive(this);
             }
         }
 
@@ -397,7 +394,9 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void WriteScalar(int value)
         {
+            ThrowIfDisposed();
             NativeMethods.core_FileStorage_writeScalar_int(ptr, value);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -406,7 +405,9 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void WriteScalar(float value)
         {
+            ThrowIfDisposed();
             NativeMethods.core_FileStorage_writeScalar_float(ptr, value);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -415,7 +416,9 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void WriteScalar(double value)
         {
+            ThrowIfDisposed();
             NativeMethods.core_FileStorage_writeScalar_double(ptr, value);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -424,14 +427,641 @@ namespace OpenCvSharp
         /// <param name="value"></param>
         public void WriteScalar(string value)
         {
+            ThrowIfDisposed();
             if (value == null)
-                throw new ArgumentNullException("nameof(value)");
+                throw new ArgumentNullException(nameof(value));
             NativeMethods.core_FileStorage_writeScalar_String(ptr, value);
+            GC.KeepAlive(this);
+        }
+
+        #endregion
+
+        #region Add
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(string val)
+        {
+            if (val == null)
+                throw new ArgumentNullException(nameof(val));
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_String(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(int val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_int(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(float val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_float(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(double val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_double(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Mat val)
+        {
+            if (val == null)
+                throw new ArgumentNullException(nameof(val));
+            ThrowIfDisposed();
+            val.ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Mat(ptr, val.CvPtr);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(SparseMat val)
+        {
+            if (val == null)
+                throw new ArgumentNullException(nameof(val));
+            ThrowIfDisposed();
+            val.ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_SparseMat(ptr, val.CvPtr);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Range val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Range(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(KeyPoint val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_KeyPoint(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(DMatch val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_DMatch(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(IEnumerable<KeyPoint> val)
+        {
+            if (val == null)
+                throw new ArgumentNullException(nameof(val));
+            ThrowIfDisposed();
+            using (var valVec = new VectorOfKeyPoint(val))
+            {
+                NativeMethods.core_FileStorage_shift_vectorOfKeyPoint(ptr, valVec.CvPtr);
+            }
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(IEnumerable<DMatch> val)
+        {
+            if (val == null)
+                throw new ArgumentNullException(nameof(val));
+            ThrowIfDisposed();
+            using (var valVec = new VectorOfDMatch(val))
+            {
+                NativeMethods.core_FileStorage_shift_vectorOfDMatch(ptr, valVec.CvPtr);
+            }
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// /Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Point val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Point2i(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Point2f val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Point2f(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Point2d val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Point2d(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Point3i val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Point3i(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Point3f val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Point3f(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Point3d val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Point3d(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Size val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Size2i(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Size2f val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Size2f(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Size2d val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Size2d(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Rect val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Rect2i(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Rect2f val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Rect2f(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Rect2d val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Rect2d(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Scalar val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Scalar(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec2i val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec2i(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec3i val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec3i(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec4i val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec4i(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec6i val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec6i(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec2d val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec2d(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec3d val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec3d(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec4d val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec4d(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec6d val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec6d(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec2f val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec2f(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec3f val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec3f(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec4f val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec4f(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec6f val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec6f(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec2b val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec2b(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec3b val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec3b(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec4b val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec4b(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec6b val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec6b(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec2s val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec2s(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec3s val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec3s(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec4s val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec4s(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec6s val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec6s(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec2w val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec2w(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec3w val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec3w(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec4w val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec4w(ptr, val);
+            GC.KeepAlive(this);
+            return this;
+        }
+
+        /// <summary>
+        /// Writes data to a file storage.
+        /// </summary>
+        /// <param name="val"></param>
+        public FileStorage Add(Vec6w val)
+        {
+            ThrowIfDisposed();
+            NativeMethods.core_FileStorage_shift_Vec6w(ptr, val);
+            GC.KeepAlive(this);
+            return this;
         }
 
         #endregion
 
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Flags]
+        public enum States
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            Undefined = 0,
+            
+            /// <summary>
+            /// 
+            /// </summary>
+            ValueExpected = 1,
+
+            /// <summary>
+            /// 
+            /// </summary>
+            NameExpected = 2,
+
+            /// <summary>
+            /// 
+            /// </summary>
+            InsideMap = 4
+        }
 
 #if LANG_JP
     /// <summary>
@@ -459,12 +1089,10 @@ namespace OpenCvSharp
 #if LANG_JP
         /// <summary>
         /// データ書き込みのためのファイルオープン 
-        /// [CV_STORAGE_WRITE]
         /// </summary>
 #else
             /// <summary>
             /// The storage is open for writing
-            /// [CV_STORAGE_WRITE]
             /// </summary>
 #endif
             Write = 1,

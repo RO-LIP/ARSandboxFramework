@@ -14,18 +14,19 @@ namespace OpenCvSharp
 #endif
     public class FastFeatureDetector : Feature2D
     {
-        private bool disposed;
-        private Ptr<FastFeatureDetector> ptrObj;
+        private Ptr ptrObj;
+
+        //internal override IntPtr PtrObj => ptrObj.CvPtr;
 
         #region Init & Disposal
 
         /// <summary>
         /// 
         /// </summary>
-        internal FastFeatureDetector(Ptr<FastFeatureDetector> ptrObj)
-			: base(ptrObj.Get())
+        protected FastFeatureDetector(IntPtr p)
         {
-			this.ptrObj = ptrObj;
+            ptrObj = new Ptr(p);
+            ptr = ptrObj.Get();
         }
 
         /// <summary>
@@ -36,41 +37,19 @@ namespace OpenCvSharp
         public static FastFeatureDetector Create(int threshold = 10, bool nonmaxSuppression = true)
         {
             IntPtr ptr = NativeMethods.features2d_FastFeatureDetector_create(threshold, nonmaxSuppression ? 1 : 0);
-			return new FastFeatureDetector(new Ptr<FastFeatureDetector>(ptr));
+            return new FastFeatureDetector(ptr);
         }
-		
+
         /// <summary>
-        /// Releases the resources
+        /// Releases managed resources
         /// </summary>
-        /// <param name="disposing">
-        /// If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged resources can be disposed.
-        /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
-        /// </param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeManaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    // releases managed resources
-                    if (disposing)
-                    {
-                        if (ptrObj != null)
-                        {
-                            ptrObj.Dispose();
-                            ptrObj = null;
-                        }
-                    }
-                    // releases unmanaged resources
-                    
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            ptrObj?.Dispose();
+            ptrObj = null;
+            base.DisposeManaged();
         }
+
         #endregion
 
         #region Properties
@@ -82,15 +61,16 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
-                return NativeMethods.features2d_FastFeatureDetector_getThreshold(ptr);
+                ThrowIfDisposed();
+                var res = NativeMethods.features2d_FastFeatureDetector_getThreshold(ptr);
+                GC.KeepAlive(this);
+                return res;
             }
             set
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
+                ThrowIfDisposed();
                 NativeMethods.features2d_FastFeatureDetector_setThreshold(ptr, value);
+                GC.KeepAlive(this);
             }
         }
 
@@ -101,15 +81,16 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
-                return NativeMethods.features2d_FastFeatureDetector_getNonmaxSuppression(ptr) != 0;
+                ThrowIfDisposed();
+                var res = NativeMethods.features2d_FastFeatureDetector_getNonmaxSuppression(ptr) != 0;
+                GC.KeepAlive(this);
+                return res;
             }
             set
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
+                ThrowIfDisposed();
                 NativeMethods.features2d_FastFeatureDetector_setNonmaxSuppression(ptr, value ? 1 : 0);
+                GC.KeepAlive(this);
             }
         }
 
@@ -120,22 +101,39 @@ namespace OpenCvSharp
         {
             get
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
-                return NativeMethods.features2d_FastFeatureDetector_getType(ptr);
+                ThrowIfDisposed();
+                var res = NativeMethods.features2d_FastFeatureDetector_getType(ptr);
+                GC.KeepAlive(this);
+                return res;
             }
             set
             {
-                if (disposed)
-                    throw new ObjectDisposedException(GetType().Name);
+                ThrowIfDisposed();
                 NativeMethods.features2d_FastFeatureDetector_setType(ptr, value);
+                GC.KeepAlive(this);
             }
         }
 
         #endregion
 
-        #region Methods
+        internal class Ptr : OpenCvSharp.Ptr
+        {
+            public Ptr(IntPtr ptr) : base(ptr)
+            {
+            }
 
-        #endregion
+            public override IntPtr Get()
+            {
+                var res = NativeMethods.features2d_Ptr_FastFeatureDetector_get(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                NativeMethods.features2d_Ptr_FastFeatureDetector_delete(ptr);
+                base.DisposeUnmanaged();
+            }
+        }
     }
 }

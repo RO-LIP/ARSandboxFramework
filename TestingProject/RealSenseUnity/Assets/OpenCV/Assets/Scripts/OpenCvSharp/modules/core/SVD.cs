@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OpenCvSharp
 {
@@ -9,15 +7,14 @@ namespace OpenCvSharp
     /// </summary>
     public class SVD : DisposableCvObject
     {
-        private bool disposed;
-
         #region Init & Disposal
+
         /// <summary>
         /// the default constructor
         /// </summary>
         public SVD()
         {
-            ptr = NativeMethods.core_SVD_new();
+            ptr = NativeMethods.core_SVD_new1();
         }
         /// <summary>
         /// the constructor that performs SVD
@@ -27,84 +24,59 @@ namespace OpenCvSharp
         public SVD(InputArray src, Flags flags = 0)
         {
             if (src == null)
-                throw new ArgumentNullException("nameof(src)");
+                throw new ArgumentNullException(nameof(src));
             src.ThrowIfDisposed();
-            ptr = NativeMethods.core_SVD_new(src.CvPtr, (int)flags);
+            ptr = NativeMethods.core_SVD_new2(src.CvPtr, (int)flags);
+            GC.KeepAlive(src);
         }
 
         /// <summary>
-        /// 
+        /// Releases unmanaged resources
         /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeUnmanaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    if (disposing)
-                    {
-                    }
-                    if (ptr != IntPtr.Zero)
-                    {
-                        NativeMethods.core_SVD_delete(ptr);
-                        ptr = IntPtr.Zero;
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            NativeMethods.core_SVD_delete(ptr);
+            base.DisposeUnmanaged();
         }
+
         #endregion
 
-        #region Properties
+        #region Methods
+
         /// <summary>
         /// eigenvalues of the covariation matrix
         /// </summary>
-        public Mat U
+        public Mat U()
         {
-            get
-            {
-                if (disposed)
-                    throw new ObjectDisposedException("SVD");
-                IntPtr ret = NativeMethods.core_SVD_u(ptr);
-                return new Mat(ret);
-            }
+
+            ThrowIfDisposed();
+            IntPtr ret = NativeMethods.core_SVD_u(ptr);
+            GC.KeepAlive(this);
+            return new Mat(ret);
         }
 
         /// <summary>
         /// eigenvalues of the covariation matrix
         /// </summary>
-        public Mat W
+        public Mat W()
         {
-            get
-            {
-                if(disposed)
-                    throw new ObjectDisposedException("SVD");
-                IntPtr ret = NativeMethods.core_SVD_w(ptr);
-                return new Mat(ret);
-            }
+            ThrowIfDisposed();
+            IntPtr ret = NativeMethods.core_SVD_w(ptr);
+            GC.KeepAlive(this);
+            return new Mat(ret);
         }
 
         /// <summary>
         /// mean value subtracted before the projection and added after the back projection
         /// </summary>
-        public Mat Vt
+        public Mat Vt()
         {
-            get
-            {
-                if (disposed)
-                    throw new ObjectDisposedException("SVD");
-                IntPtr ret = NativeMethods.core_SVD_vt(ptr);
-                return new Mat(ret);
-            }
+            ThrowIfDisposed();
+            IntPtr ret = NativeMethods.core_SVD_vt(ptr);
+            GC.KeepAlive(this);
+            return new Mat(ret);
         }
-        #endregion
 
-        #region Methods
         /// <summary>
         /// the operator that performs SVD. The previously allocated SVD::u, SVD::w are SVD::vt are released.
         /// </summary>
@@ -113,12 +85,12 @@ namespace OpenCvSharp
         /// <returns></returns>
         public SVD Run(InputArray src, Flags flags = 0)
         {
-            if (disposed)
-                throw new ObjectDisposedException("SVD");
+            ThrowIfDisposed();
             if (src == null)
-                throw new ArgumentNullException("nameof(src)");
+                throw new ArgumentNullException(nameof(src));
             src.ThrowIfDisposed();
             NativeMethods.core_SVD_operatorThis(ptr, src.CvPtr, (int)flags);
+            GC.KeepAlive(src);
             return this;
         }
 
@@ -130,15 +102,17 @@ namespace OpenCvSharp
         /// <returns></returns>
         public void BackSubst(InputArray rhs, OutputArray dst)
         {
-            if (disposed)
-                throw new ObjectDisposedException("SVD");
+            ThrowIfDisposed();
             if (rhs == null)
-                throw new ArgumentNullException("nameof(rhs)");
+                throw new ArgumentNullException(nameof(rhs));
             if (dst == null)
-                throw new ArgumentNullException("nameof(dst)");
+                throw new ArgumentNullException(nameof(dst));
             rhs.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.core_SVD_backSubst(ptr, rhs.CvPtr, dst.CvPtr);
+            GC.KeepAlive(this);
+            GC.KeepAlive(rhs);
+            GC.KeepAlive(dst);
         }
         #endregion
 
@@ -156,21 +130,25 @@ namespace OpenCvSharp
             OutputArray u, OutputArray vt, Flags flags = 0)
         {
             if (src == null)
-                throw new ArgumentNullException("nameof(src)");
+                throw new ArgumentNullException(nameof(src));
             if (w == null)
-                throw new ArgumentNullException("nameof(w)");
+                throw new ArgumentNullException(nameof(w));
             if (u == null)
-                throw new ArgumentNullException("nameof(u)");
+                throw new ArgumentNullException(nameof(u));
             if (vt == null)
-                throw new ArgumentNullException("nameof(vt)");
+                throw new ArgumentNullException(nameof(vt));
             src.ThrowIfDisposed();
             w.ThrowIfNotReady();
             u.ThrowIfNotReady();
             vt.ThrowIfNotReady();
-            NativeMethods.core_SVD_static_compute(src.CvPtr, w.CvPtr, u.CvPtr, vt.CvPtr, (int)flags);
+            NativeMethods.core_SVD_static_compute1(src.CvPtr, w.CvPtr, u.CvPtr, vt.CvPtr, (int)flags);
             w.Fix();
             u.Fix();
             vt.Fix();
+            GC.KeepAlive(src);
+            GC.KeepAlive(w);
+            GC.KeepAlive(u);
+            GC.KeepAlive(vt);
         }
 
         /// <summary>
@@ -182,13 +160,15 @@ namespace OpenCvSharp
         public static void Compute(InputArray src, OutputArray w, Flags flags = 0)
         {
             if (src == null)
-                throw new ArgumentNullException("nameof(src)");
+                throw new ArgumentNullException(nameof(src));
             if (w == null)
-                throw new ArgumentNullException("nameof(w)");
+                throw new ArgumentNullException(nameof(w));
             src.ThrowIfDisposed();
             w.ThrowIfNotReady();
-            NativeMethods.core_SVD_static_compute(src.CvPtr, w.CvPtr, (int)flags);
+            NativeMethods.core_SVD_static_compute2(src.CvPtr, w.CvPtr, (int)flags);
             w.Fix();
+            GC.KeepAlive(src);
+            GC.KeepAlive(w);
         }
 
         /// <summary>
@@ -203,15 +183,15 @@ namespace OpenCvSharp
             InputArray vt, InputArray rhs, OutputArray dst)
         {
             if (w == null)
-                throw new ArgumentNullException("nameof(w)");
+                throw new ArgumentNullException(nameof(w));
             if (u == null)
-                throw new ArgumentNullException("nameof(u)");
+                throw new ArgumentNullException(nameof(u));
             if (vt == null)
-                throw new ArgumentNullException("nameof(vt)");
+                throw new ArgumentNullException(nameof(vt));
             if (rhs == null)
-                throw new ArgumentNullException("nameof(rhs)");
+                throw new ArgumentNullException(nameof(rhs));
             if (dst == null)
-                throw new ArgumentNullException("nameof(dst)");
+                throw new ArgumentNullException(nameof(dst));
             w.ThrowIfDisposed();
             u.ThrowIfDisposed();
             vt.ThrowIfDisposed();
@@ -219,6 +199,11 @@ namespace OpenCvSharp
             dst.ThrowIfNotReady();
             NativeMethods.core_SVD_static_backSubst(w.CvPtr, u.CvPtr, vt.CvPtr, rhs.CvPtr, dst.CvPtr);
             dst.Fix();
+            GC.KeepAlive(w);
+            GC.KeepAlive(u);
+            GC.KeepAlive(vt);
+            GC.KeepAlive(rhs);
+            GC.KeepAlive(dst);
         }
 
         /// <summary>
@@ -229,21 +214,23 @@ namespace OpenCvSharp
         public static void SolveZ(InputArray src, OutputArray dst)
         {
             if (src == null)
-                throw new ArgumentNullException("nameof(src)");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("nameof(dst)");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.core_SVD_static_solveZ(src.CvPtr, dst.CvPtr);
             dst.Fix();
+            GC.KeepAlive(src);
+            GC.KeepAlive(dst);
         }
 
         #endregion
 
 #if LANG_JP
-   	/// <summary>
-	/// VDの操作フラグ
-	/// </summary>
+       /// <summary>
+       /// SVDの操作フラグ
+       /// </summary>
 #else
         /// <summary>
         /// Operation flags for SVD
@@ -258,9 +245,9 @@ namespace OpenCvSharp
             None = 0,
 
 #if LANG_JP
-		/// <summary>
-		/// 計算中に行列Aの変更を行うことができる．このフラグの指定は処理速度を向上させる．
-		/// </summary>
+        /// <summary>
+        /// 計算中に行列Aの変更を行うことができる．このフラグの指定は処理速度を向上させる．
+        /// </summary>
 #else
             /// <summary>
             /// enables modification of matrix src1 during the operation. It speeds up the processing. 

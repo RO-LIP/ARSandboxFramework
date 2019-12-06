@@ -47,7 +47,7 @@ namespace OpenCvSharp
         /// <returns>Filtered image.</returns>
         public Mat FilterByLabel(Mat src, Mat dst, int labelValue)
         {
-            return FilterByLabels(src, dst, new[] {labelValue});
+            return FilterByLabels(src, dst, new[] { labelValue });
         }
 
         /// <summary>
@@ -60,11 +60,11 @@ namespace OpenCvSharp
         public Mat FilterByLabels(Mat src, Mat dst, IEnumerable<int> labelValues)
         {
             if (src == null)
-                throw new ArgumentNullException("nameof(src)");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("nameof(dst)");
+                throw new ArgumentNullException(nameof(dst));
             if (labelValues == null)
-                throw new ArgumentNullException("nameof(labelValues)");
+                throw new ArgumentNullException(nameof(labelValues));
             int[] labelArray = EnumerableEx.ToArray(labelValues);
             if (labelArray.Length == 0)
                 throw new ArgumentException("empty labelValues");
@@ -99,7 +99,7 @@ namespace OpenCvSharp
         /// <returns>Filtered image.</returns>
         public Mat FilterByBlob(Mat src, Mat dst, Blob blob)
         {
-            return FilterByLabels(src, dst, new[] {blob.Label});
+            return FilterByLabels(src, dst, new[] { blob.Label });
         }
 
         /// <summary>
@@ -120,8 +120,8 @@ namespace OpenCvSharp
         /// <param name="img">The target image to be drawn.</param>
         public void RenderBlobs(Mat img)
         {
-            if (img == null) 
-                throw new ArgumentNullException("nameof(img)");
+            if (img == null)
+                throw new ArgumentNullException(nameof(img));
             /*
             if (img.Empty())
                 throw new ArgumentException("img is empty");
@@ -142,8 +142,8 @@ namespace OpenCvSharp
             {
                 colors[i] = Scalar.RandomColor();
             }
-            
-            using (var imgt = new MatOfByte3(img))
+
+            using (var imgt = new Mat<Vec3b>(img))
             {
                 var indexer = imgt.GetIndexer();
                 for (int y = 0; y < height; y++)

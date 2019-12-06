@@ -11,6 +11,8 @@ namespace OpenCvSharp
     static partial class NativeMethods
     {
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void face_FaceRecognizer_delete(IntPtr obj);
+        [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void face_FaceRecognizer_train(
             IntPtr obj, IntPtr[] src, int srcLength, int[] labels, int labelsLength);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
@@ -22,13 +24,13 @@ namespace OpenCvSharp
         public static extern void face_FaceRecognizer_predict2(
             IntPtr obj, IntPtr src, out int label, out double confidence);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void face_FaceRecognizer_save1(IntPtr obj, string filename);
+        public static extern void face_FaceRecognizer_write1(IntPtr obj, string filename);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void face_FaceRecognizer_load1(IntPtr obj, string filename);
+        public static extern void face_FaceRecognizer_read1(IntPtr obj, string filename);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void face_FaceRecognizer_save2(IntPtr obj, IntPtr fs);
+        public static extern void face_FaceRecognizer_write2(IntPtr obj, IntPtr fs);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void face_FaceRecognizer_load2(IntPtr obj, IntPtr fs);
+        public static extern void face_FaceRecognizer_read2(IntPtr obj, IntPtr fs);
 
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void face_FaceRecognizer_setLabelInfo(IntPtr obj, int label,
@@ -42,5 +44,10 @@ namespace OpenCvSharp
         public static extern double face_FaceRecognizer_getThreshold(IntPtr obj);
         [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void face_FaceRecognizer_setThreshold(IntPtr obj, double val);
+
+        [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern IntPtr face_Ptr_FaceRecognizer_get(IntPtr obj);
+        [DllImport(DllExtern, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void face_Ptr_FaceRecognizer_delete(IntPtr obj);
     }
 }

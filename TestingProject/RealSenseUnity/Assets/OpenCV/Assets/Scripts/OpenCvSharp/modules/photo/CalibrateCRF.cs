@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using OpenCvSharp.Util;
 
 namespace OpenCvSharp
@@ -19,13 +18,13 @@ namespace OpenCvSharp
         public virtual void Process(IEnumerable<Mat> src, OutputArray dst, IEnumerable<float> times)
         {
             if (src == null)
-                throw new ArgumentNullException("nameof(src)");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("nameof(dst)");
+                throw new ArgumentNullException(nameof(dst));
             if (times == null)
-                throw new ArgumentNullException("nameof(times)");
+                throw new ArgumentNullException(nameof(times));
             dst.ThrowIfNotReady();
-            
+
             IntPtr[] srcArray = EnumerableEx.SelectPtrs(src);
             float[] timesArray = EnumerableEx.ToArray(times);
             if (srcArray.Length != timesArray.Length)
@@ -34,7 +33,9 @@ namespace OpenCvSharp
             NativeMethods.photo_CalibrateCRF_process(ptr, srcArray, srcArray.Length, dst.CvPtr, timesArray);
 
             dst.Fix();
+            GC.KeepAlive(this);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
         }
     }
 }

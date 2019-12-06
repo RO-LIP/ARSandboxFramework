@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+#if ENABLED_CUDA
+using OpenCvSharp.Cuda;
+#endif
 
 namespace OpenCvSharp
 {
@@ -8,7 +11,6 @@ namespace OpenCvSharp
     /// </summary>
     public class OutputArray : DisposableCvObject
     {
-        private bool disposed;
         private readonly object obj;
 
         #region Init & Disposal
@@ -19,10 +21,26 @@ namespace OpenCvSharp
         internal OutputArray(Mat mat)
         {
             if (mat == null)
-                throw new ArgumentNullException("nameof(mat)");
+                throw new ArgumentNullException(nameof(mat));
             ptr = NativeMethods.core_OutputArray_new_byMat(mat.CvPtr);
+            GC.KeepAlive(mat);
             obj = mat;
         }
+
+#if ENABLED_CUDA
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mat"></param>
+        internal OutputArray(GpuMat mat)
+        {
+            if (mat == null)
+                throw new ArgumentNullException(nameof(mat));
+            ptr = NativeMethods.core_OutputArray_new_byGpuMat(mat.CvPtr);
+            GC.KeepAlive(mat);
+            obj = mat;
+        }
+#endif
 
         /// <summary>
         /// 
@@ -31,7 +49,7 @@ namespace OpenCvSharp
         internal OutputArray(IEnumerable<Mat> mat)
         {
             if (mat == null)
-                throw new ArgumentNullException("nameof(mat)");
+                throw new ArgumentNullException(nameof(mat));
             using (var matVector = new VectorOfMat(mat))
             {
                 ptr = NativeMethods.core_OutputArray_new_byVectorOfMat(matVector.CvPtr);
@@ -40,34 +58,17 @@ namespace OpenCvSharp
         }
 
         /// <summary>
-        /// 
+        /// Releases unmanaged resources
         /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeUnmanaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    if (disposing)
-                    {
-                    }
-                    if (ptr != IntPtr.Zero)
-                    {
-                        NativeMethods.core_OutputArray_delete(ptr);
-                        ptr = IntPtr.Zero;
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            NativeMethods.core_OutputArray_delete(ptr);
+            base.DisposeUnmanaged();
         }
-        #endregion
 
-        #region Cast
+#endregion
+
+#region Cast
         /// <summary>
         /// 
         /// </summary>
@@ -78,14 +79,24 @@ namespace OpenCvSharp
             return new OutputArray(mat);
         }
 
+#if ENABLED_CUDA
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static implicit operator OutputArray(GpuMat mat)
+        {
+            return new OutputArray(mat);
+        }
+#endif
 
+#endregion
 
-        #endregion
+#region Operators
+#endregion
 
-        #region Operators
-        #endregion
-
-        #region Methods
+#region Methods
         /// <summary>
         /// 
         /// </summary>
@@ -104,7 +115,28 @@ namespace OpenCvSharp
             return obj as Mat;
         }
 
-     
+#if ENABLED_CUDA
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool IsGpuMat()
+        {
+            return obj is GpuMat;
+        }
+#endif
+
+#if ENABLED_CUDA
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual Mat GetGpuMat()
+        {
+            return obj as GpuMat;
+        }
+#endif
+
         /// <summary>
         /// 
         /// </summary>
@@ -146,6 +178,12 @@ namespace OpenCvSharp
                 NativeMethods.core_Mat_delete(outMat);
                 */
             }
+#if ENABLED_CUDA
+            else if (IsGpuMat())
+            {
+                // do nothing
+            }
+#endif
             else
             {
                 throw new OpenCvSharpException("Not supported OutputArray-compatible type");
@@ -169,9 +207,13 @@ namespace OpenCvSharp
         {
             return
                 ptr != IntPtr.Zero &&
-                !disposed &&
+                !IsDisposed &&
                 obj != null &&
-                (IsMat());
+#if ENABLED_CUDA
+                (IsMat() || IsGpuMat());
+#else
+                IsMat();
+#endif
         }
         /// <summary>
         /// 
@@ -193,6 +235,17 @@ namespace OpenCvSharp
             return new OutputArray(mat);
         }
 
+#if ENABLED_CUDA
+        /// <summary>
+        /// Creates a proxy class of the specified matrix
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static OutputArray Create(GpuMat mat)
+        {
+            return new OutputArray(mat);
+        }
+#endif
 
         /// <summary>
         /// Creates a proxy class of the specified list
@@ -201,10 +254,10 @@ namespace OpenCvSharp
         /// <param name="list"></param>
         /// <returns></returns>
         public static OutputArrayOfStructList<T> Create<T>(List<T> list)
-            where T : struct
+            where T : unmanaged
         {
             if (list == null)
-                throw new ArgumentNullException("nameof(list)");
+                throw new ArgumentNullException(nameof(list));
             return new OutputArrayOfStructList<T>(list);
         }
 
@@ -216,10 +269,10 @@ namespace OpenCvSharp
         public static OutputArrayOfMatList Create(List<Mat> list)
         {
             if (list == null)
-                throw new ArgumentNullException("nameof(list)");
+                throw new ArgumentNullException(nameof(list));
             return new OutputArrayOfMatList(list);
         }
 
-        #endregion
+#endregion
     }
 }

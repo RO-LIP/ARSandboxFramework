@@ -11,6 +11,11 @@ namespace OpenCvSharp
     public struct Size2f : IEquatable<Size2f>
     {
         /// <summary>
+        /// sizeof(Size2f)
+        /// </summary>
+        public const int SizeOf = sizeof(int) * 2;
+
+        /// <summary>
         /// 
         /// </summary>
         public float Width;
@@ -38,8 +43,8 @@ namespace OpenCvSharp
         /// <param name="height"></param>
         public Size2f(double width, double height)
         {
-            Width = (int) width;
-            Height = (int) height;
+            Width = (float) width;
+            Height = (float) height;
         }
 
         #region Operators

@@ -50,7 +50,7 @@ namespace OpenCvSharp
         public static explicit operator uint(RNG_MT19937 self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return self.Next();
         }
 
@@ -62,7 +62,7 @@ namespace OpenCvSharp
         public static explicit operator int(RNG_MT19937 self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return (int)self.Next();
         }
 
@@ -74,7 +74,7 @@ namespace OpenCvSharp
         public static explicit operator float(RNG_MT19937 self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             return self.Next() * (1.0f / 4294967296.0f);
         }
 
@@ -86,7 +86,7 @@ namespace OpenCvSharp
         public static explicit operator double(RNG_MT19937 self)
         {
             if (self == null)
-                throw new ArgumentNullException("nameof(self)");
+                throw new ArgumentNullException(nameof(self));
             uint a = self.Next() >> 5;
             uint b = self.Next() >> 6;
             return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);

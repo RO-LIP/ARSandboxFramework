@@ -15,20 +15,32 @@ namespace OpenCvSharp
     /// BRISK implementation
     /// </summary>
 #endif
+    // ReSharper disable once InconsistentNaming
     public class BRISK : Feature2D
     {
-        private bool disposed;
-        private Ptr<BRISK> ptrObj;
+        private Ptr ptrObj;
+
+        //internal override IntPtr PtrObj => ptrObj.CvPtr;
 
         #region Init & Disposal
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected BRISK()
+            : base()
+        {
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="p"></param>
-        internal BRISK(Ptr<BRISK> p)
-            : base(p.Get())
+        protected BRISK(IntPtr p)
+            : base()
         {
-			ptrObj = p;
+            ptrObj = new Ptr(p);
+            ptr = ptrObj.Get();
         }
 
         /// <summary>
@@ -40,7 +52,7 @@ namespace OpenCvSharp
         public static BRISK Create(int thresh = 30, int octaves = 3, float patternScale = 1.0f)
         {
             IntPtr p = NativeMethods.features2d_BRISK_create1(thresh, octaves, patternScale);
-            return new BRISK(new Ptr<BRISK>(p));
+            return new BRISK(p);
         }
 
         /// <summary>
@@ -58,61 +70,29 @@ namespace OpenCvSharp
             IEnumerable<int> indexChange = null)
         {
             if (radiusList == null)
-                throw new ArgumentNullException("nameof(radiusList)");
+                throw new ArgumentNullException(nameof(radiusList));
             if (numberList == null)
-                throw new ArgumentNullException("nameof(numberList)");
+                throw new ArgumentNullException(nameof(numberList));
             float[] radiusListArray = EnumerableEx.ToArray(radiusList);
             int[] numberListArray = EnumerableEx.ToArray(numberList);
-            int[] indexChangeArray = EnumerableEx.ToArray(indexChange);
+            int[] indexChangeArray = (indexChange == null) ? null : EnumerableEx.ToArray(indexChange);
 
             IntPtr p = NativeMethods.features2d_BRISK_create2(
                 radiusListArray, radiusListArray.Length,
                 numberListArray, numberListArray.Length,
                 dMax, dMin,
-                indexChangeArray, indexChangeArray.Length);
-            return new BRISK(new Ptr<BRISK>(p));
+                indexChangeArray, indexChangeArray?.Length ?? 0);
+            return new BRISK(p);
         }
 
-#if LANG_JP
-    /// <summary>
-    /// リソースの解放
-    /// </summary>
-    /// <param name="disposing">
-    /// trueの場合は、このメソッドがユーザコードから直接が呼ばれたことを示す。マネージ・アンマネージ双方のリソースが解放される。
-    /// falseの場合は、このメソッドはランタイムからファイナライザによって呼ばれ、もうほかのオブジェクトから参照されていないことを示す。アンマネージリソースのみ解放される。
-    ///</param>
-#else
         /// <summary>
-        /// Releases the resources
+        /// Releases managed resources
         /// </summary>
-        /// <param name="disposing">
-        /// If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged resources can be disposed.
-        /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
-        /// </param>
-#endif
-        protected override void Dispose(bool disposing)
+        protected override void DisposeManaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    // releases managed resources
-                    if (disposing)
-                    {
-                        // releases unmanaged resources
-                        if (ptrObj != null)
-                        {
-                            ptrObj.Dispose();
-                            ptrObj = null;
-                        }
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            ptrObj?.Dispose();
+            ptrObj = null;
+            base.DisposeManaged();
         }
 
         #endregion
@@ -120,5 +100,25 @@ namespace OpenCvSharp
         #region Methods
 
         #endregion
+
+        internal class Ptr : OpenCvSharp.Ptr
+        {
+            public Ptr(IntPtr ptr) : base(ptr)
+            {
+            }
+
+            public override IntPtr Get()
+            {
+                var res = NativeMethods.features2d_Ptr_BRISK_get(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                NativeMethods.features2d_Ptr_BRISK_delete(ptr);
+                base.DisposeUnmanaged();
+            }
+        }
     }
 }

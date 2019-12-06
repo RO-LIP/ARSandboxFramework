@@ -10,13 +10,6 @@ namespace OpenCvSharp
     public class VectorOfPoint : DisposableCvObject, IStdVector<Point>
     {
         /// <summary>
-        /// Track whether Dispose has been called
-        /// </summary>
-        private bool disposed = false;
-
-        #region Init and Dispose
-
-        /// <summary>
         /// 
         /// </summary>
         public VectorOfPoint()
@@ -31,7 +24,7 @@ namespace OpenCvSharp
         public VectorOfPoint(int size)
         {
             if (size < 0)
-                throw new ArgumentOutOfRangeException("nameof(size)");
+                throw new ArgumentOutOfRangeException(nameof(size));
             ptr = NativeMethods.vector_Point2i_new2(new IntPtr(size));
         }
 
@@ -51,47 +44,31 @@ namespace OpenCvSharp
         public VectorOfPoint(IEnumerable<Point> data)
         {
             if (data == null)
-                throw new ArgumentNullException("nameof(data)");
+                throw new ArgumentNullException(nameof(data));
             Point[] array = EnumerableEx.ToArray(data);
             ptr = NativeMethods.vector_Point2i_new3(array, new IntPtr(array.Length));
         }
 
         /// <summary>
-        /// Clean up any resources being used.
+        /// Releases unmanaged resources
         /// </summary>
-        /// <param name="disposing">
-        /// If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged resources can be disposed.
-        /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
-        /// </param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeUnmanaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    if (IsEnabledDispose)
-                    {
-                        NativeMethods.vector_Point2i_delete(ptr);
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            NativeMethods.vector_Point2i_delete(ptr);
+            base.DisposeUnmanaged();
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// vector.size()
         /// </summary>
         public int Size
         {
-            get { return NativeMethods.vector_Point2i_getSize(ptr).ToInt32(); }
+            get
+            {
+                var res = NativeMethods.vector_Point2i_getSize(ptr).ToInt32();
+                GC.KeepAlive(this);
+                return res;
+            }
         }
 
         /// <summary>
@@ -99,12 +76,13 @@ namespace OpenCvSharp
         /// </summary>
         public IntPtr ElemPtr
         {
-            get { return NativeMethods.vector_Point2i_getPointer(ptr); }
+            get
+            {
+                var res = NativeMethods.vector_Point2i_getPointer(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Converts std::vector to managed array
@@ -120,11 +98,11 @@ namespace OpenCvSharp
             Point[] dst = new Point[size];
             using (var dstPtr = new ArrayAddress1<Point>(dst))
             {
-                Util.Utility.CopyMemory(dstPtr, ElemPtr, Point.SizeOf*dst.Length);
+                MemoryHelper.CopyMemory(dstPtr, ElemPtr, Point.SizeOf*dst.Length);
             }
+            GC.KeepAlive(this); // ElemPtr is IntPtr to memory held by this object, so
+                                // make sure we are not disposed until finished with copy.
             return dst;
         }
-
-        #endregion
     }
 }

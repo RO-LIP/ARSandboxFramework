@@ -59,8 +59,7 @@ namespace OpenCvSharp
     /// </summary>
     public sealed class Stitcher : DisposableCvObject
     {
-        private bool disposed;
-        private Ptr<Stitcher> ptrObj;
+        private Ptr ptrObj;
 
         #region Enum
 
@@ -71,10 +70,26 @@ namespace OpenCvSharp
         /// </summary>
         public enum Status
         {
-            OK,
-            ErrorNeedMoreImgs,
+            OK = 0,
+            ErrorNeedMoreImgs = 1,
+            ErrorHomographyEstFail = 2,
+            ErrorCameraParamsAdjustFail = 3
         }
 
+        public enum Mode
+        {
+            /// <summary>
+            /// Mode for creating photo panoramas. Expects images under perspective
+            /// transformation and projects resulting pano to sphere.
+            /// </summary>
+            Panorama = 0,
+
+            /// <summary>
+            /// Mode for composing scans. Expects images under affine transformation does
+            /// not compensate exposure by default.
+            /// </summary>
+            Scans = 1,
+        }
 
         #endregion
 
@@ -83,51 +98,32 @@ namespace OpenCvSharp
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ptr">cv::Stitcher*</param>
-        private Stitcher(IntPtr ptr)
+        /// <param name="p">cv::Stitcher*</param>
+        private Stitcher(IntPtr p)
         {
-            this.ptr = ptr;
+            ptrObj = new Ptr(p);
+            ptr = ptrObj.Get();
         }
 
         /// <summary>
-        /// Creates a stitcher with the default parameters.
+        /// Creates a Stitcher configured in one of the stitching modes.
         /// </summary>
-        /// <param name="tryUseGpu">Flag indicating whether GPU should be used 
-        /// whenever it's possible.</param>
-        public static Stitcher Create(bool tryUseGpu = false)
+        /// <param name="mode">Scenario for stitcher operation. This is usually determined by source of images
+        /// to stitch and their transformation.Default parameters will be chosen for operation in given scenario.</param>
+        public static Stitcher Create(Mode mode = Mode.Panorama)
         {
-            IntPtr ptr = NativeMethods.stitching_createStitcher(tryUseGpu ? 1 : 0);
-            return new Stitcher(ptr);
+            IntPtr p = NativeMethods.stitching_Stitcher_create((int)mode);
+            return new Stitcher(p);
         }
 
         /// <summary>
-        /// Deletes all resources 
+        /// Releases managed resources
         /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeManaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    // releases managed resources
-                    if (disposing)
-                    {
-                        if (ptrObj != null)
-                        {
-                            ptrObj.Dispose();
-                            ptrObj = null;
-                        }
-                    }
-                    // releases unmanaged resources
-                    ptr = IntPtr.Zero;
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            ptrObj?.Dispose();
+            ptrObj = null;
+            base.DisposeManaged();
         }
 
         #endregion
@@ -136,38 +132,92 @@ namespace OpenCvSharp
 
         public double RegistrationResol
         {
-            get { return NativeMethods.stitching_Stitcher_registrationResol(ptr); }
-            set { NativeMethods.stitching_Stitcher_setRegistrationResol(ptr, value); }
+            get
+            {
+                var res = NativeMethods.stitching_Stitcher_registrationResol(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+            set
+            {
+                NativeMethods.stitching_Stitcher_setRegistrationResol(ptr, value);
+                GC.KeepAlive(this);
+            }
         }
 
         public double SeamEstimationResol
         {
-            get { return NativeMethods.stitching_Stitcher_seamEstimationResol(ptr); }
-            set { NativeMethods.stitching_Stitcher_setRegistrationResol(ptr, value); }
+            get
+            {
+                var res = NativeMethods.stitching_Stitcher_seamEstimationResol(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+            set
+            {
+                NativeMethods.stitching_Stitcher_setSeamEstimationResol(ptr, value);
+                GC.KeepAlive(this);
+            }
         }
 
         public double CompositingResol
         {
-            get { return NativeMethods.stitching_Stitcher_compositingResol(ptr); }
-            set { NativeMethods.stitching_Stitcher_setRegistrationResol(ptr, value); }
+            get
+            {
+                var res = NativeMethods.stitching_Stitcher_compositingResol(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+            set
+            {
+                NativeMethods.stitching_Stitcher_setCompositingResol(ptr, value);
+                GC.KeepAlive(this);
+            }
         }
 
         public double PanoConfidenceThresh
         {
-            get { return NativeMethods.stitching_Stitcher_panoConfidenceThresh(ptr); }
-            set { NativeMethods.stitching_Stitcher_setRegistrationResol(ptr, value); }
+            get
+            {
+                var res = NativeMethods.stitching_Stitcher_panoConfidenceThresh(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+            set
+            {
+                NativeMethods.stitching_Stitcher_setPanoConfidenceThresh(ptr, value);
+                GC.KeepAlive(this);
+            }
         }
 
         public bool WaveCorrection
         {
-            get { return NativeMethods.stitching_Stitcher_waveCorrection(ptr) != 0; }
-            set { NativeMethods.stitching_Stitcher_setRegistrationResol(ptr, value ? 1 : 0); }
+            get
+            {
+                var res = NativeMethods.stitching_Stitcher_waveCorrection(ptr) != 0;
+                GC.KeepAlive(this);
+                return res;
+            }
+            set
+            {
+                NativeMethods.stitching_Stitcher_setWaveCorrection(ptr, value ? 1 : 0);
+                GC.KeepAlive(this);
+            }
         }
 
         public WaveCorrectKind WaveCorrectKind
         {
-            get { return (WaveCorrectKind)NativeMethods.stitching_Stitcher_waveCorrectKind(ptr); }
-            set { NativeMethods.stitching_Stitcher_setRegistrationResol(ptr, (int)value); }
+            get
+            {
+                var res = (WaveCorrectKind)NativeMethods.stitching_Stitcher_waveCorrectKind(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+            set
+            {
+                NativeMethods.stitching_Stitcher_setWaveCorrectKind(ptr, (int)value);
+                GC.KeepAlive(this);
+            }
         }
 
         public FeaturesFinder FeaturesFinder
@@ -229,6 +279,7 @@ namespace OpenCvSharp
 
                 int[] ret = new int[length];
                 Marshal.Copy(pointer, ret, 0, length);
+                GC.KeepAlive(this); // needs to be after copy of unmanaged data
                 return ret;
             }
         }
@@ -240,7 +291,12 @@ namespace OpenCvSharp
 
         public double WorkScale
         {
-            get { return NativeMethods.stitching_Stitcher_workScale(ptr); }
+            get
+            {
+                var res = NativeMethods.stitching_Stitcher_workScale(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
         }
 
         #endregion
@@ -250,20 +306,22 @@ namespace OpenCvSharp
         public Status EstimateTransform(InputArray images)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             images.ThrowIfDisposed();
 
             int status = NativeMethods.stitching_Stitcher_estimateTransform_InputArray1(
                 ptr, images.CvPtr);
+            GC.KeepAlive(this);
+            GC.KeepAlive(images);
             return (Status)status;
         }
 
         public Status EstimateTransform(InputArray images, Rect[][] rois)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             if (rois == null)
-                throw new ArgumentNullException("nameof(rois)");
+                throw new ArgumentNullException(nameof(rois));
             images.ThrowIfDisposed();
 
             using (var roisPointer = new ArrayAddress2<Rect>(rois))
@@ -271,6 +329,8 @@ namespace OpenCvSharp
                 int status = NativeMethods.stitching_Stitcher_estimateTransform_InputArray2(
                     ptr, images.CvPtr,
                     roisPointer.Pointer, roisPointer.Dim1Length, roisPointer.Dim2Lengths);
+                GC.KeepAlive(this);
+                GC.KeepAlive(images);
                 return (Status)status;
             }
         }
@@ -278,21 +338,23 @@ namespace OpenCvSharp
         public Status EstimateTransform(IEnumerable<Mat> images)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
 
             IntPtr[] imagesPtrs = EnumerableEx.SelectPtrs(images);
 
             int status = NativeMethods.stitching_Stitcher_estimateTransform_MatArray1(
                 ptr, imagesPtrs, imagesPtrs.Length);
+            GC.KeepAlive(this);
+            GC.KeepAlive(images);
             return (Status)status;
         }
 
         public Status EstimateTransform(IEnumerable<Mat> images, Rect[][] rois)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             if (rois == null)
-                throw new ArgumentNullException("nameof(rois)");
+                throw new ArgumentNullException(nameof(rois));
 
             IntPtr[] imagesPtrs = EnumerableEx.SelectPtrs(images);
 
@@ -301,6 +363,8 @@ namespace OpenCvSharp
                 int status = NativeMethods.stitching_Stitcher_estimateTransform_MatArray2(
                     ptr, imagesPtrs, imagesPtrs.Length,
                     roisPointer.Pointer, roisPointer.Dim1Length, roisPointer.Dim2Lengths);
+                GC.KeepAlive(this);
+                GC.KeepAlive(images);
                 return (Status)status;
             }
         }
@@ -308,42 +372,50 @@ namespace OpenCvSharp
         public Status ComposePanorama(OutputArray pano)
         {
             if (pano == null)
-                throw new ArgumentNullException("nameof(pano)");
+                throw new ArgumentNullException(nameof(pano));
             pano.ThrowIfNotReady();
 
             int status = NativeMethods.stitching_Stitcher_composePanorama1(
                 ptr, pano.CvPtr);
             pano.Fix();
+            GC.KeepAlive(this);
+            GC.KeepAlive(pano);
             return (Status)status;
         }
 
         public Status ComposePanorama(InputArray images, OutputArray pano)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             if (pano == null)
-                throw new ArgumentNullException("nameof(pano)");
+                throw new ArgumentNullException(nameof(pano));
             images.ThrowIfDisposed();
             pano.ThrowIfNotReady();
 
             int status = NativeMethods.stitching_Stitcher_composePanorama2_InputArray(
                 ptr, images.CvPtr, pano.CvPtr);
             pano.Fix();
+            GC.KeepAlive(this);
+            GC.KeepAlive(images);
+            GC.KeepAlive(pano);
             return (Status)status;
         }
 
         public Status ComposePanorama(IEnumerable<Mat> images, OutputArray pano)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             if (pano == null)
-                throw new ArgumentNullException("nameof(pano)");
+                throw new ArgumentNullException(nameof(pano));
             pano.ThrowIfNotReady();
 
             IntPtr[] imagesPtrs = EnumerableEx.SelectPtrs(images);
             int status = NativeMethods.stitching_Stitcher_composePanorama2_MatArray(
                 ptr, imagesPtrs, imagesPtrs.Length, pano.CvPtr);
             pano.Fix();
+            GC.KeepAlive(this);
+            GC.KeepAlive(images);
+            GC.KeepAlive(pano);
             return (Status)status;
         }
 
@@ -356,15 +428,17 @@ namespace OpenCvSharp
         public Status Stitch(InputArray images, OutputArray pano)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             if (pano == null)
-                throw new ArgumentNullException("nameof(pano)");
+                throw new ArgumentNullException(nameof(pano));
             images.ThrowIfDisposed();
             pano.ThrowIfNotReady();
 
             Status status = (Status)NativeMethods.stitching_Stitcher_stitch1_InputArray(
                 ptr, images.CvPtr, pano.CvPtr);
-
+            GC.KeepAlive(this);
+            GC.KeepAlive(images);
+            GC.KeepAlive(pano);
             pano.Fix();
 
             return status;
@@ -379,16 +453,18 @@ namespace OpenCvSharp
         public Status Stitch(IEnumerable<Mat> images, OutputArray pano)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             if (pano == null)
-                throw new ArgumentNullException("nameof(pano)");
+                throw new ArgumentNullException(nameof(pano));
             pano.ThrowIfNotReady();
 
             IntPtr[] imagesPtrs = EnumerableEx.SelectPtrs(images);
 
             Status status = (Status)NativeMethods.stitching_Stitcher_stitch1_MatArray(
                 ptr, imagesPtrs, imagesPtrs.Length, pano.CvPtr);
-
+            GC.KeepAlive(this);
+            GC.KeepAlive(images);
+            GC.KeepAlive(pano);
             pano.Fix();
 
             return status;
@@ -404,11 +480,11 @@ namespace OpenCvSharp
         public Status Stitch(InputArray images, Rect[][] rois, OutputArray pano)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             if (rois == null)
-                throw new ArgumentNullException("nameof(rois)");
+                throw new ArgumentNullException(nameof(rois));
             if (pano == null)
-                throw new ArgumentNullException("nameof(pano)");
+                throw new ArgumentNullException(nameof(pano));
             images.ThrowIfDisposed();
             pano.ThrowIfNotReady();
 
@@ -419,6 +495,9 @@ namespace OpenCvSharp
                     roisPointer.Pointer, roisPointer.Dim1Length, roisPointer.Dim2Lengths,
                     pano.CvPtr);
                 pano.Fix();
+                GC.KeepAlive(this);
+                GC.KeepAlive(images);
+                GC.KeepAlive(pano);
                 return (Status)status;
             }
         }
@@ -433,11 +512,11 @@ namespace OpenCvSharp
         public Status Stitch(IEnumerable<Mat> images, Rect[][] rois, OutputArray pano)
         {
             if (images == null)
-                throw new ArgumentNullException("nameof(images)");
+                throw new ArgumentNullException(nameof(images));
             if (rois == null)
-                throw new ArgumentNullException("nameof(rois)");
+                throw new ArgumentNullException(nameof(rois));
             if (pano == null)
-                throw new ArgumentNullException("nameof(pano)");
+                throw new ArgumentNullException(nameof(pano));
             pano.ThrowIfNotReady();
 
             IntPtr[] imagesPtrs = EnumerableEx.SelectPtrs(images);
@@ -449,10 +528,33 @@ namespace OpenCvSharp
                     roisPointer.Pointer, roisPointer.Dim1Length, roisPointer.Dim2Lengths,
                     pano.CvPtr);
                 pano.Fix();
+                GC.KeepAlive(this);
+                GC.KeepAlive(images);
+                GC.KeepAlive(pano);
                 return (Status)status;
             }
         }
 
         #endregion
+
+        internal class Ptr : OpenCvSharp.Ptr
+        {
+            public Ptr(IntPtr ptr) : base(ptr)
+            {
+            }
+
+            public override IntPtr Get()
+            {
+                var res = NativeMethods.stitching_Ptr_Stitcher_get(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                NativeMethods.stitching_Ptr_Stitcher_delete(ptr);
+                base.DisposeUnmanaged();
+            }
+        }
     }
 }

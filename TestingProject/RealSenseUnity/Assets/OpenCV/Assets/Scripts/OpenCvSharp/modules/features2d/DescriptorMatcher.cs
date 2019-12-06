@@ -10,18 +10,12 @@ namespace OpenCvSharp
     /// </summary>
     public class DescriptorMatcher : Algorithm
     {
-        private bool disposed;
-
         /// <summary>
         /// 
         /// </summary>
-        private Ptr<DescriptorMatcher> detectorPtr;
+        private Ptr detectorPtr;
 
-		//UFIX
         //internal virtual IntPtr PtrObj => detectorPtr.CvPtr;
-		internal virtual IntPtr PtrObj {
-			get { return detectorPtr.CvPtr; }
-		}
 
         #region Init & Disposal
 
@@ -41,8 +35,8 @@ namespace OpenCvSharp
         /// <returns></returns>
         public static DescriptorMatcher Create(string descriptorMatcherType)
         {
-            if (String.IsNullOrEmpty(descriptorMatcherType))
-                throw new ArgumentNullException("nameof(descriptorMatcherType)");
+            if (string.IsNullOrEmpty(descriptorMatcherType))
+                throw new ArgumentNullException(nameof(descriptorMatcherType));
 
             switch (descriptorMatcherType)
             {
@@ -91,7 +85,7 @@ namespace OpenCvSharp
         {
             if (ptr == IntPtr.Zero)
                 throw new OpenCvSharpException("Invalid cv::Ptr<DescriptorMatcher> pointer");
-            var ptrObj = new Ptr<DescriptorMatcher>(ptr);
+            var ptrObj = new Ptr(ptr);
             var detector = new DescriptorMatcher
             {
                 detectorPtr = ptrObj,
@@ -116,49 +110,14 @@ namespace OpenCvSharp
             return detector;
         }
 
-
-#if LANG_JP
-    /// <summary>
-    /// リソースの解放
-    /// </summary>
-    /// <param name="disposing">
-    /// trueの場合は、このメソッドがユーザコードから直接が呼ばれたことを示す。マネージ・アンマネージ双方のリソースが解放される。
-    /// falseの場合は、このメソッドはランタイムからファイナライザによって呼ばれ、もうほかのオブジェクトから参照されていないことを示す。アンマネージリソースのみ解放される。
-    ///</param>
-#else
         /// <summary>
-        /// Releases the resources
+        /// Releases managed resources
         /// </summary>
-        /// <param name="disposing">
-        /// If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged resources can be disposed.
-        /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
-        /// </param>
-#endif
-        protected override void Dispose(bool disposing)
+        protected override void DisposeManaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    // releases managed resources
-                    if (disposing)
-                    {
-                    }
-                    // releases unmanaged resources
-                    if (IsEnabledDispose)
-                    {
-                        if (detectorPtr != null)
-                            detectorPtr.Dispose();
-                        detectorPtr = null;
-                        ptr = IntPtr.Zero;
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            detectorPtr.Dispose();
+            detectorPtr = null;
+            base.DisposeManaged();
         }
 
         #endregion
@@ -173,7 +132,7 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             if (descriptors == null)
-                throw new ArgumentNullException("nameof(descriptors)");
+                throw new ArgumentNullException(nameof(descriptors));
 
             Mat[] descriptorsArray = EnumerableEx.ToArray(descriptors);
             if (descriptorsArray.Length == 0)
@@ -181,6 +140,8 @@ namespace OpenCvSharp
 
             IntPtr[] descriptorsPtrs = EnumerableEx.SelectPtrs(descriptorsArray);
             NativeMethods.features2d_DescriptorMatcher_add(ptr, descriptorsPtrs, descriptorsPtrs.Length);
+            GC.KeepAlive(this);
+            GC.KeepAlive(descriptorsArray);
         }
 
         /// <summary>
@@ -193,6 +154,7 @@ namespace OpenCvSharp
             using (var matVec = new VectorOfMat())
             {
                 NativeMethods.features2d_DescriptorMatcher_getTrainDescriptors(ptr, matVec.CvPtr);
+                GC.KeepAlive(this);
                 return matVec.ToArray();
             }
         }
@@ -204,6 +166,7 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             NativeMethods.features2d_DescriptorMatcher_clear(ptr);
+            GC.KeepAlive(this);
         }
 
         /// <summary>
@@ -213,7 +176,9 @@ namespace OpenCvSharp
         public virtual new bool Empty()
         {
             ThrowIfDisposed();
-            return NativeMethods.features2d_DescriptorMatcher_empty(ptr) != 0;
+            var res = NativeMethods.features2d_DescriptorMatcher_empty(ptr) != 0;
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
@@ -223,7 +188,9 @@ namespace OpenCvSharp
         public virtual bool IsMaskSupported()
         {
             ThrowIfDisposed();
-            return NativeMethods.features2d_DescriptorMatcher_isMaskSupported(ptr) != 0;
+            var res = NativeMethods.features2d_DescriptorMatcher_isMaskSupported(ptr) != 0;
+            GC.KeepAlive(this);
+            return res;
         }
 
         /// <summary>
@@ -240,6 +207,7 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             NativeMethods.features2d_DescriptorMatcher_train(ptr);
+            GC.KeepAlive(this);
         }
 
         #region *Match
@@ -255,14 +223,18 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             if (queryDescriptors == null)
-                throw new ArgumentNullException("nameof(queryDescriptors)");
+                throw new ArgumentNullException(nameof(queryDescriptors));
             if (trainDescriptors == null)
-                throw new ArgumentNullException("nameof(trainDescriptors)");
+                throw new ArgumentNullException(nameof(trainDescriptors));
             using (var matchesVec = new VectorOfDMatch())
             {
                 NativeMethods.features2d_DescriptorMatcher_match1(
                     ptr, queryDescriptors.CvPtr, trainDescriptors.CvPtr,
                     matchesVec.CvPtr, Cv2.ToPtr(mask));
+                GC.KeepAlive(this);
+                GC.KeepAlive(queryDescriptors);
+                GC.KeepAlive(trainDescriptors);
+                GC.KeepAlive(mask);
                 return matchesVec.ToArray();
             }
         }
@@ -284,14 +256,18 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             if (queryDescriptors == null)
-                throw new ArgumentNullException("nameof(queryDescriptors)");
+                throw new ArgumentNullException(nameof(queryDescriptors));
             if (trainDescriptors == null)
-                throw new ArgumentNullException("nameof(trainDescriptors)");
+                throw new ArgumentNullException(nameof(trainDescriptors));
             using (var matchesVec = new VectorOfVectorDMatch())
             {
                 NativeMethods.features2d_DescriptorMatcher_knnMatch1(
                     ptr, queryDescriptors.CvPtr, trainDescriptors.CvPtr,
                     matchesVec.CvPtr, k, Cv2.ToPtr(mask), compactResult ? 1 : 0);
+                GC.KeepAlive(this);
+                GC.KeepAlive(queryDescriptors);
+                GC.KeepAlive(trainDescriptors);
+                GC.KeepAlive(mask);
                 return matchesVec.ToArray();
             }
         }
@@ -311,14 +287,18 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             if (queryDescriptors == null)
-                throw new ArgumentNullException("nameof(queryDescriptors)");
+                throw new ArgumentNullException(nameof(queryDescriptors));
             if (trainDescriptors == null)
-                throw new ArgumentNullException("nameof(trainDescriptors)");
+                throw new ArgumentNullException(nameof(trainDescriptors));
             using (var matchesVec = new VectorOfVectorDMatch())
             {
                 NativeMethods.features2d_DescriptorMatcher_radiusMatch1(
                     ptr, queryDescriptors.CvPtr, trainDescriptors.CvPtr,
                     matchesVec.CvPtr, maxDistance, Cv2.ToPtr(mask), compactResult ? 1 : 0);
+                GC.KeepAlive(this);
+                GC.KeepAlive(queryDescriptors);
+                GC.KeepAlive(trainDescriptors);
+                GC.KeepAlive(mask);
                 return matchesVec.ToArray();
             }
         }
@@ -333,7 +313,7 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             if (queryDescriptors == null)
-                throw new ArgumentNullException("nameof(queryDescriptors)");
+                throw new ArgumentNullException(nameof(queryDescriptors));
 
             var masksPtrs = new IntPtr[0];
             if (masks != null)
@@ -345,6 +325,9 @@ namespace OpenCvSharp
             {
                 NativeMethods.features2d_DescriptorMatcher_match2(
                     ptr, queryDescriptors.CvPtr, matchesVec.CvPtr, masksPtrs, masksPtrs.Length);
+                GC.KeepAlive(this);
+                GC.KeepAlive(queryDescriptors);
+                GC.KeepAlive(masks);
                 return matchesVec.ToArray();
             }
         }
@@ -364,7 +347,7 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             if (queryDescriptors == null)
-                throw new ArgumentNullException("nameof(queryDescriptors)");
+                throw new ArgumentNullException(nameof(queryDescriptors));
 
             var masksPtrs = new IntPtr[0];
             if (masks != null)
@@ -377,6 +360,9 @@ namespace OpenCvSharp
                 NativeMethods.features2d_DescriptorMatcher_knnMatch2(
                     ptr, queryDescriptors.CvPtr, matchesVec.CvPtr, k,
                     masksPtrs, masksPtrs.Length, compactResult ? 1 : 0);
+                GC.KeepAlive(this);
+                GC.KeepAlive(queryDescriptors);
+                GC.KeepAlive(masks);
                 return matchesVec.ToArray();
             }
         }
@@ -394,7 +380,7 @@ namespace OpenCvSharp
         {
             ThrowIfDisposed();
             if (queryDescriptors == null)
-                throw new ArgumentNullException("nameof(queryDescriptors)");
+                throw new ArgumentNullException(nameof(queryDescriptors));
 
             var masksPtrs = new IntPtr[0];
             if (masks != null)
@@ -407,6 +393,9 @@ namespace OpenCvSharp
                 NativeMethods.features2d_DescriptorMatcher_radiusMatch2(
                     ptr, queryDescriptors.CvPtr, matchesVec.CvPtr, maxDistance, 
                     masksPtrs, masksPtrs.Length, compactResult ? 1 : 0);
+                GC.KeepAlive(this);
+                GC.KeepAlive(queryDescriptors);
+                GC.KeepAlive(masks);
                 return matchesVec.ToArray();
             }
         }
@@ -414,5 +403,25 @@ namespace OpenCvSharp
         #endregion
 
         #endregion
+
+        internal class Ptr : OpenCvSharp.Ptr
+        {
+            public Ptr(IntPtr ptr) : base(ptr)
+            {
+            }
+
+            public override IntPtr Get()
+            {
+                var res = NativeMethods.features2d_Ptr_DescriptorMatcher_get(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                NativeMethods.features2d_Ptr_DescriptorMatcher_delete(ptr);
+                base.DisposeUnmanaged();
+            }
+        }
     }
 }

@@ -10,8 +10,7 @@ namespace OpenCvSharp.Aruco
         /// <summary>
         /// cv::Ptr&lt;T&gt;
         /// </summary>
-		//internal Ptr<Dictionary> ObjectPtr { get; }
-		internal Ptr<Dictionary> ptrObj;
+        internal Ptr ObjectPtr { get; }
 
         #region Init & Disposal
 
@@ -20,8 +19,16 @@ namespace OpenCvSharp.Aruco
         /// </summary>
         internal Dictionary(IntPtr p)
         {
-			ptrObj = new Ptr<Dictionary>(p);
-			ptr = ptrObj.Get();
+            ObjectPtr = new Ptr(p);
+            ptr = ObjectPtr.Get();
+        }
+
+        /// <summary>
+        /// Releases managed resources
+        /// </summary>
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
         }
 
         #endregion
@@ -37,6 +44,7 @@ namespace OpenCvSharp.Aruco
             {
                 ThrowIfDisposed();
                 IntPtr ret = NativeMethods.aruco_Dictionary_getBytesList(ptr);
+                GC.KeepAlive(this);
                 return new Mat(ret);
             }
         }
@@ -49,12 +57,15 @@ namespace OpenCvSharp.Aruco
             get
             {
                 ThrowIfDisposed();
-                return NativeMethods.aruco_Dictionary_getMarkerSize(ptr);
+                var res = NativeMethods.aruco_Dictionary_getMarkerSize(ptr);
+                GC.KeepAlive(this);
+                return res;
             }
             set
             {
                 ThrowIfDisposed();
                 NativeMethods.aruco_Dictionary_setMarkerSize(ptr, value);
+                GC.KeepAlive(this);
             }
         }
 
@@ -66,17 +77,39 @@ namespace OpenCvSharp.Aruco
             get
             {
                 ThrowIfDisposed();
-                return NativeMethods.aruco_Dictionary_getMaxCorrectionBits(ptr);
+                var res = NativeMethods.aruco_Dictionary_getMaxCorrectionBits(ptr);
+                GC.KeepAlive(this);
+                return res;
             }
             set
             {
                 ThrowIfDisposed();
                 NativeMethods.aruco_Dictionary_setMaxCorrectionBits(ptr, value);
+                GC.KeepAlive(this);
             }
         }
 
         #endregion
 
+        internal class Ptr : OpenCvSharp.Ptr
+        {
+            public Ptr(IntPtr ptr) : base(ptr)
+            {
+            }
+
+            public override IntPtr Get()
+            {
+                var res = NativeMethods.aruco_Ptr_Dictionary_get(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
+
+            protected override void DisposeUnmanaged()
+            {
+                NativeMethods.aruco_Ptr_Dictionary_delete(ptr);
+                base.DisposeUnmanaged();
+            }
+        }
 
     }
 }

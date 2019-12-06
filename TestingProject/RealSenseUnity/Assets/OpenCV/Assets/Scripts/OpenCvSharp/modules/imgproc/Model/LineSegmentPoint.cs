@@ -220,8 +220,7 @@ namespace OpenCvSharp
             int dx = x2 - x1;
             int dy = y2 - y1;
             double t1 = (f2*dy - g2*dx)/det;
-			//UFIX Warning
-            //double t2 = (f1*dy - g1*dx)/det;
+            double t2 = (f1*dy - g1*dx)/det;
 
             return new Point
             {

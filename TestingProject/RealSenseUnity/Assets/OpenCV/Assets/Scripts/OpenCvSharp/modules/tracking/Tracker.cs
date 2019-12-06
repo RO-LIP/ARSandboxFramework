@@ -1,70 +1,34 @@
-﻿namespace OpenCvSharp.Tracking
+﻿using System;
+
+namespace OpenCvSharp.Tracking
 {
-	using System;
-
-	/// <summary>
-	/// Base abstract class for the long-term tracker
-	/// </summary>
-	public class Tracker : Algorithm
+    /// <summary>
+    /// Base abstract class for the long-term tracker
+    /// </summary>
+    public abstract class Tracker : Algorithm
     {
-        /// <summary>
-        /// cv::Ptr&lt;T&gt;
-        /// </summary>
-        private Ptr ptrObj;
-		
+        internal Ptr PtrObj { get; private set; }
+
         /// <summary>
         /// 
         /// </summary>
-        protected Tracker(IntPtr p)
+        /// <param name="ptrObj"></param>
+        protected Tracker(Ptr ptrObj)
         {
-            ptrObj = new Ptr(p);
+            PtrObj = ptrObj;
             ptr = ptrObj.Get();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="trackerType"></param>
-        public static Tracker Create(TrackerTypes trackerType)
-        {
-            IntPtr ptr;
-            switch (trackerType)
-            {
-                case TrackerTypes.Boosting:
-                    ptr = NativeMethods.tracking_Tracker_create("BOOSTING");
-                    break;
-                case TrackerTypes.GOTURN:
-                    ptr = NativeMethods.tracking_Tracker_create("GOTURN");
-                    break;
-                case TrackerTypes.TLD:
-                    ptr = NativeMethods.tracking_Tracker_create("TLD");
-                    break;
-                case TrackerTypes.KCF:
-                    ptr = NativeMethods.tracking_Tracker_create("KCF");
-                    break;
-                case TrackerTypes.MedianFlow:
-                    ptr = NativeMethods.tracking_Tracker_create("MEDIANFLOW");
-                    break;
-                case TrackerTypes.MIL:
-                    ptr = NativeMethods.tracking_Tracker_create("MIL");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(trackerType.ToString(), trackerType, null);
-            }
-
-            return new Tracker(ptr);
         }
 
         /// <summary>
         /// Releases managed resources
         /// </summary>
-        protected override void DisposeUnmanaged()
+        protected override void DisposeManaged()
         {
-			if (null != ptrObj)
-				ptrObj.Dispose();
-            ptrObj = null;
+            PtrObj?.Dispose();
+            PtrObj = null;
+            base.DisposeManaged();
         }
-		
+
         /// <summary>
         /// Initialize the tracker with a know bounding box that surrounding the target
         /// </summary>
@@ -76,10 +40,11 @@
             ThrowIfDisposed();
 
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
 
             image.ThrowIfDisposed();
-            var ret = NativeMethods.tracking_Tracker_init(this.ptr, image.CvPtr, boundingBox);
+            var ret = NativeMethods.tracking_Tracker_init(ptr, image.CvPtr, boundingBox);
+            GC.KeepAlive(this);
             GC.KeepAlive(image);
 
             return ret;
@@ -98,37 +63,14 @@
             ThrowIfDisposed();
 
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
 
             image.ThrowIfDisposed();
-            var ret = NativeMethods.tracking_Tracker_update(this.ptr, image.CvPtr, ref boundingBox);
+            var ret = NativeMethods.tracking_Tracker_update(ptr, image.CvPtr, ref boundingBox);
+            GC.KeepAlive(this);
             GC.KeepAlive(image);
 
             return ret;
-        }
-		
-		/// <summary>
-		/// cv::ptr<> wrapper specialization for the Tracker
-		/// </summary>
-        internal class Ptr : OpenCvSharp.Ptr<Tracker>
-        {
-            public Ptr(IntPtr ptr)
-				: base(ptr)
-            {}
-
-			/// <summary>
-			/// Override
-			/// </summary>
-			/// <returns></returns>
-            public override IntPtr Get()
-            {
-                return NativeMethods.tracking_Ptr_Tracker_get(ptr);
-            }
-
-            protected override void DisposeUnmanaged()
-            {
-                NativeMethods.tracking_Ptr_Tracker_delete(ptr);
-            }
         }
     }
 }
