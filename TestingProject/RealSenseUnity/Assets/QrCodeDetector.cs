@@ -21,16 +21,18 @@
                 using (var colorFrame = frameSet.ColorFrame)
                 {
                 if (colorFrame == null) return;
+                // set isDetecting true to avoid crashes 
                 isDetecting = true;
                 int cfWidth = colorFrame.Width;
                     int cfHeight = colorFrame.Height;
+                // transform realsense frame into cv mat format
                 using (var image = new Mat(cfWidth, cfHeight, MatType.CV_8U, colorFrame.Data))
                 {
                     using (qrCodeDetector = new QRCodeDetector())
                     {
+                        // check frame if qrcode is existing
                         bool detected = qrCodeDetector.Detect(image, out var points);
                         
-                        isDetecting = false;
                         Debug.Log(detected);
                         if (detected)
                         {
@@ -42,8 +44,7 @@
                                 Debug.Log(decodedString);
                             }
                         }
-                        
-
+                        isDetecting = false;
                     }
 
                 }
