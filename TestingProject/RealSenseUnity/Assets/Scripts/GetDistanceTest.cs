@@ -7,7 +7,6 @@ public class GetDistanceTest : MonoBehaviour
 {
     public Terrain terrain;
     public RsProcessingPipe processingPipe;
-    public RsDevice rsDevice;
     ConcurrentQueue<float[,]> heightMapQueue = new ConcurrentQueue<float[,]>();
     ConcurrentQueue<float[,]> tempheightMapQueue = new ConcurrentQueue<float[,]>();
     ConcurrentQueue<float[,,]> splatMapQueue = new ConcurrentQueue<float[,,]>();
