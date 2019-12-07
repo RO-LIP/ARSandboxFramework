@@ -29,12 +29,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bec95ba2af23efd408d33138086f1c65, type: 3}
   m_Name: RsTemporalFilter
   m_EditorClassIdentifier: 
-  enabled: 0
+  enabled: 1
   _filterSmoothAlpha: 0.4
   _filterSmoothDelta: 20
   _temporalPersistence: 3
@@ -77,12 +77,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48f1a4dc738fa514aa5e5d4cc3665aae, type: 3}
   m_Name: RsSpatialFilter
   m_EditorClassIdentifier: 
-  enabled: 0
+  enabled: 1
   _filterMagnitude: 2
   _filterSmoothAlpha: 0.5
   _filterSmoothDelta: 20
@@ -94,12 +94,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab8658da5fac1924385546d4cfccbea4, type: 3}
   m_Name: RsDecimationFilter
   m_EditorClassIdentifier: 
-  enabled: 0
+  enabled: 1
   _streamFilter: 1
   _formatFilter: 1
   _filterMagnitude: 4
@@ -124,12 +124,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7dffddaeb99d79644b99b1d8d18bad86, type: 3}
   m_Name: RsThresholdFilter
   m_EditorClassIdentifier: 
-  enabled: 0
+  enabled: 1
   MinDistance: 0
   MaxDistance: 4
 --- !u!114 &114894276943703578
