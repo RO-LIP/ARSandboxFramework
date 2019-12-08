@@ -4,13 +4,14 @@ using System.Collections;
 using OpenCvSharp;
 using UnityEngine.UI;
 using Intel.RealSense;
+using NumSharp;
 
 public class QrCodeDetector : MonoBehaviour
 {
     private QRCodeDetector qrCodeDetector;
     private bool isDetecting = false;
     public RsProcessingPipe processingPipe;
-
+    private bool showImage = false;
     void OnNewSample(Frame frame)
     {
         if (isDetecting) return;
@@ -27,6 +28,7 @@ public class QrCodeDetector : MonoBehaviour
                 // transform realsense frame into cv mat format
                 using (var image = new Mat(cfHeight, cfWidth, MatType.CV_8UC3, colorFrame.Data))
                 {
+
                     using (qrCodeDetector = new QRCodeDetector())
                     {
                         // Show generated Image in separate window
@@ -40,7 +42,11 @@ public class QrCodeDetector : MonoBehaviour
                             {
                                 qrCodeDetector.Decode(image, points);
                                 var decodedString = qrCodeDetector.Decode(image, points, straightQrCode);
-                                Debug.Log(decodedString);
+                                if (!string.IsNullOrEmpty(decodedString))
+                                {
+                                    Debug.Log(decodedString);
+                                }
+                                
                             }
                         }
                         isDetecting = false;
