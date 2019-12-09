@@ -5,13 +5,15 @@ using OpenCvSharp;
 using UnityEngine.UI;
 using Intel.RealSense;
 using NumSharp;
-
+using System.Collections.Concurrent;
 public class QrCodeDetector : MonoBehaviour
 {
+    private SpawnHandler spawnHandler; 
     private QRCodeDetector qrCodeDetector;
     private bool isDetecting = false;
     public RsProcessingPipe processingPipe;
     private bool showImage = false;
+    ConcurrentQueue<string> actionEventQueue = new ConcurrentQueue<string>();
     void OnNewSample(Frame frame)
     {
         if (isDetecting) return;
@@ -45,6 +47,8 @@ public class QrCodeDetector : MonoBehaviour
                                 if (!string.IsNullOrEmpty(decodedString))
                                 {
                                     Debug.Log(decodedString);
+                                    if(decodedString =="tiger") actionEventQueue.Enqueue("spawnTiger");
+                                    if(decodedString =="house") actionEventQueue.Enqueue("spawnHouse");
                                 }
                                 
                             }
@@ -56,6 +60,14 @@ public class QrCodeDetector : MonoBehaviour
         }
     }
 
+    private void Update(){
+        if (!actionEventQueue.IsEmpty)
+            {
+                string eventName;
+                actionEventQueue.TryDequeue(out eventName);
+                EventManager.TriggerEvent(eventName);
+            }
+    }
     private void Start()
     {
         processingPipe.OnNewSample += OnNewSample;
