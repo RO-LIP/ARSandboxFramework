@@ -118,10 +118,10 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _WaterDepth: 0.6627227
+    - _WaterDepth: 0.4763166
     - _WaveIntensity: 1.15
     - _WaveScrollSpeed: 0.04
-    - _WaveStrength: 0.054239154
+    - _WaveStrength: -0.42630154
     - _ZWrite: 1
     m_Colors:
     - Color_9CF6986D: {r: 0, g: 0.41200018, b: 1, a: 0}

@@ -97,10 +97,10 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _Upper1: 0.09105301
-    - _Upper2: 0.097724155
-    - _Upper3: 0.4968247
-    - _Upper4: 0.9541936
+    - _Upper1: 0.04478689
+    - _Upper2: 0.56556535
+    - _Upper3: 0.55877334
+    - _Upper4: 0.67916256
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
