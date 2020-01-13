@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Water
-  m_Shader: {fileID: -6465566751694194690, guid: 0172559deefb31349b8e94a92704c282,
+  m_Name: WaterShaderMat
+  m_Shader: {fileID: -6465566751694194690, guid: dbdd0312d5f4f9742b06d3a07aa6117a,
     type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -118,7 +118,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _WaterDepth: 0.5858681
+    - _WaterDepth: 1
     - _WaveIntensity: 1.15
     - _WaveScrollSpeed: 0.04
     - _ZWrite: 1
