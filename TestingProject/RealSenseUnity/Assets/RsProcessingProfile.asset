@@ -42,7 +42,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 475d71c97716db644863efe7bddfbd70, type: 3}
-  m_Name: Processing
+  m_Name: RsProcessingProfile
   m_EditorClassIdentifier: 
   _processingBlocks:
   - {fileID: -8478785719689253300}
