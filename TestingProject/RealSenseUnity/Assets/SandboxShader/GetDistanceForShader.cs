@@ -14,34 +14,8 @@ public class GetDistanceForShader: MonoBehaviour
     int height;
     float[,] Map;
 
-
     public float noiseCutoff;
 
-    public float texture0Cutoff;
-    public float texture1Cutoff;
-    public float texture2Cutoff;
-
-    public float textureTransitionSize;
-
-    public void SetTexture0Cutoff(float newValue)
-    {
-        texture0Cutoff = newValue;
-    }
-
-    public void SetTexture1Cutoff(float newValue)
-    {
-        texture1Cutoff = newValue;
-    }
-
-    public void SetTexture2Cutoff(float newValue)
-    {
-        texture2Cutoff = newValue;
-    }
-
-    public void SetTextureTransitionSize(float newValue)
-    {
-        textureTransitionSize = newValue;
-    }
 
     void OnNewSample(Frame frame)
     {
