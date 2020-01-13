@@ -1,10 +1,7 @@
 ﻿
 using UnityEngine;
-using System.Collections;
 using OpenCvSharp;
-using UnityEngine.UI;
 using Intel.RealSense;
-using NumSharp;
 using System.Collections.Concurrent;
 public class QrCodeDetector : MonoBehaviour
 {
