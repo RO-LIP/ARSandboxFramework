@@ -33,4 +33,9 @@ public class TextureChangerScript : MonoBehaviour
         water.SetFloat("_WaterDepth", f);
     }
 
+    public void SetWaterWave(float f)
+    {
+        water.SetFloat("_WaveStrength", f);
+    }
+
 }
