@@ -32,7 +32,7 @@ public class TigerMovement : MonoBehaviour
     // only works in build, does not work in editor
     private bool mouseIsOnScreenOfTargetingCamera()
     {
-        return Display.RelativeMouseAt(Input.mousePosition).z != NavAgentDestinationSelectionCamera.targetDisplay;
+        return Display.RelativeMouseAt(Input.mousePosition).z == NavAgentDestinationSelectionCamera.targetDisplay;
     }
 
     private bool leftMouseButtonDown()
