@@ -69,12 +69,12 @@ NavMeshProjectSettings:
     cost: 1
   - name: 
     cost: 1
-  m_LastAgentTypeID: -887442657
+  m_LastAgentTypeID: -1372625422
   m_Settings:
   - serializedVersion: 2
     agentTypeID: 0
-    agentRadius: 10
-    agentHeight: 20
+    agentRadius: 12
+    agentHeight: 10
     agentSlope: 50
     agentClimb: 10
     ledgeDropHeight: 0
@@ -88,4 +88,4 @@ NavMeshProjectSettings:
     debug:
       m_Flags: 0
   m_SettingNames:
-  - Humanoid
+  - Tiger

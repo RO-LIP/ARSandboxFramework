@@ -43,7 +43,6 @@ public class QrCodeDetector : MonoBehaviour
                                 var decodedString = qrCodeDetector.Decode(image, points, straightQrCode);
                                 if (!string.IsNullOrEmpty(decodedString))
                                 {
-                                    Debug.Log(decodedString);
                                     if(decodedString =="tiger") actionEventQueue.Enqueue("spawnTiger");
                                     if(decodedString =="house") actionEventQueue.Enqueue("spawnHouse");
                                 }
