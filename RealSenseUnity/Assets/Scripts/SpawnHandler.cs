@@ -20,13 +20,11 @@ public class SpawnHandler : MonoBehaviour
 
 
     void spawnTiger(){
-        Debug.Log(screenBounds.z);
         GameObject a = Instantiate(tigerPrefab) as GameObject;
         a.transform.position= new Vector3(Random.Range(300,screenBounds.x), 100,Random.Range(4,220));
     }
 
     void spawnHouse(){
-        Debug.Log(screenBounds.z);
         GameObject a = Instantiate(housePrefab) as GameObject;
         // these "magic" numbers are just the spawning area ...
         // feel free to change this in a smarter way

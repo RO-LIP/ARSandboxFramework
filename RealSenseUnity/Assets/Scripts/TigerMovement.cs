@@ -16,15 +16,27 @@ public class TigerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (leftMouseButtonDown() && mouseIsOnScreenOfTargetingCamera())
         {
-            RaycastHit hitInfo = new RaycastHit();
+            RaycastHit hitInfo;
             Ray ray = NavAgentDestinationSelectionCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray.origin, ray.direction, out hitInfo))
+
+            if (Physics.Raycast(ray, out hitInfo))
                 navMeshAgent.destination = hitInfo.point;
         }
 
-        bool isMoving = navMeshAgent.velocity.magnitude > 0.1f;
-        animator.SetBool("isMoving", isMoving);
+        bool tigerIsMoving = navMeshAgent.velocity.magnitude > 0.1f;
+        animator.SetBool("isMoving", tigerIsMoving);
+    }
+
+    // only works in build, does not work in editor
+    private bool mouseIsOnScreenOfTargetingCamera()
+    {
+        return Display.RelativeMouseAt(Input.mousePosition).z != NavAgentDestinationSelectionCamera.targetDisplay;
+    }
+
+    private bool leftMouseButtonDown()
+    {
+        return Input.GetMouseButtonDown(0);
     }
 }
