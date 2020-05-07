@@ -1,7 +1,7 @@
 # Unity Framework for AR Sandboxes
 
 This was an student project at the [TH Rosenheim](https://www.th-rosenheim.de/) in Wintersemester 2019/2020.
-Credits for this Work go to [Christian Kink](https://github.com/WhatzzUp) and [Patrick Stadler](https://github.com/patsta32)
+Credits for this Work go to [Christian Kink](https://github.com/WhatzzUp),Alexander Gebhardt, Johannes Nowack and [Patrick Stadler](https://github.com/patsta32)
 
 This framework uses the [Intel Real Sense SDK 2](https://www.intel.de/content/www/de/de/architecture-and-technology/realsense-overview.html) and should be compatible with all supporting Cameras. Currently only RealSense d415 was tested.
 
